@@ -1,0 +1,12 @@
+[Unit]
+Description=Run dhclient on tun0
+After=tinc@{{ vpn_name }}.service
+Requires=tinc@{{ vpn_name }}.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/dhclient {{ vpn_iface }}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

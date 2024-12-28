@@ -1,0 +1,10 @@
+--- 
+
+- name: Create {{ firecracker_iface }} interface
+  template:
+    src: tap.cfg.j2
+    dest: /etc/network/interfaces.d/{{ firecracker_iface }}.cfg
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart firecracker iface

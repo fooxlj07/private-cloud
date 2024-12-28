@@ -1,0 +1,13 @@
+---
+# the first ip as dhcp ip
+priv_ip: "172.16.1.1"
+tinc_mac_addr: "01:42:ac:11:00:02"
+
+bridge_ip: "192.168.100.1"
+bridge_mac_addr: "11:42:ac:11:00:02"
+
+vms_ip_range_start: 192.168.100.10
+vms_ip_range_end: 192.168.100.50
+
+vms_mac_addr_range_start: "52:54:00:01:00:00"
+vms_mac_addr_range_end: "52:54:00:01:00:FF"

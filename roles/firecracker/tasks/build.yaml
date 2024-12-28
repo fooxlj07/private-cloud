@@ -1,0 +1,100 @@
+---
+
+- name: Make a dir to store kernel 
+  file:
+    path: "{{ firecracker_files_dir }}"
+    state: directory
+    mode: '0644'
+
+- name: Get executable kernel
+  block:
+  - name: Get the latest version of vmlinux
+    shell:
+      cmd: |
+        wget "http://spec.ccfc.min.s3.amazonaws.com/?prefix=firecracker-ci/v1.11/{{ ansible_architecture }}/vmlinux-5.10&list-type=2" -O - 2>/dev/null | \
+        grep -oP "(?<=<Key>)(firecracker-ci/v1.11/{{ ansible_architecture }}/vmlinux-5\.10\.[0-9]{1,3})(?=</Key>)"
+    register: latest_vmlinux
+  
+  - name: Set latest vmlinux version as a fact
+    set_fact:
+      vmlinux_latest: "{{ latest_vmlinux.stdout }}"
+  
+  - name: Extract vmlinux version
+    set_fact:
+      vmlinux_version: "{{ vmlinux_latest | regex_replace('.*/(vmlinux-[0-9.]+)$', '\\1') }}"
+
+  - name: Download vmlinux
+    get_url: 
+      url: "https://s3.amazonaws.com/spec.ccfc.min/{{ vmlinux_latest }}"
+      dest: "{{ firecracker_files_dir }}/{{ vmlinux_version }}"
+
+  tags:
+    - fck_kernel
+
+- name: Build rootfs 
+  block:
+  - name: Install unsquash pkg
+    apt: 
+      name: squashfs-tools
+      state: present
+      update_cache: true
+
+  - name: Download ubuntu-24 rootfs
+    get_url:
+      url: "https://s3.amazonaws.com/spec.ccfc.min/firecracker-ci/v1.11/{{ ansible_architecture }}/{{ firecracker_rootfs }}.squashfs"
+      dest: "/tmp/{{ firecracker_rootfs }}.squashfs.upstream"
+
+  - name: Make squashfs-root dir 
+    file: 
+      path: "{{ firecracker_files_dir }}/squashfs-root"
+      state: directory
+
+  - name: Unsquash the rootfs
+    shell:
+      cmd: unsquashfs -f -d {{ firecracker_files_dir }}/squashfs-root /tmp/{{ firecracker_rootfs }}.squashfs.upstream
+
+  - name: Generate ssh key
+    openssh_keypair:
+      path: "{{ firecracker_files_dir }}/vms_id_rsa"
+      force: true
+
+  - name: Ensure .ssh directory exists
+    ansible.builtin.file:
+      path: "{{ firecracker_files_dir }}/squashfs-root/root/.ssh"
+      state: directory
+      mode: '0700'
+
+  - name: Copy public key to rootfs
+    copy:
+      src: "{{ firecracker_files_dir }}/vms_id_rsa.pub"
+      dest: "{{ firecracker_files_dir }}/squashfs-root/root/.ssh/authorized_keys"
+      remote_src: true
+      mode: '0600'
+  
+  - name: Change rootfs ownership
+    file:
+      path: "{{ firecracker_files_dir }}/squashfs-root"
+      owner: root
+      group: root
+      recurse: yes
+
+  - name: Resize file to 400 MB if needed
+    command:
+      cmd: truncate -s 400M {{ firecracker_files_dir }}/{{ firecracker_rootfs }}.ext4
+
+  - name: Format into ext4 
+    shell:
+      cmd: mkfs.ext4 -d {{ firecracker_files_dir }}/squashfs-root -F {{ firecracker_files_dir }}/{{ firecracker_rootfs }}.ext4
+
+  - name: Clean up squashfs
+    file: 
+      path: "{{ firecracker_files_dir }}/squashfs-root"
+      state: absent
+
+  - name: Clean up /tmp
+    file:
+      path: "/tmp/{{ firecracker_rootfs }}.squashfs.upstream"
+      state: absent
+
+  tags: 
+    - fck_rootfs

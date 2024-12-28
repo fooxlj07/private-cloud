@@ -1,0 +1,4 @@
+auto {{ firecracker_iface }}
+iface {{ firecracker_iface }} inet manual
+    pre-up ip tuntap add {{ firecracker_iface }} mode tap
+    post-down ip tuntap del {{ firecracker_iface }} mode tap

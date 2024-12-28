@@ -1,0 +1,42 @@
+---
+
+- name: Prepare servers
+  hosts: all
+  become: true
+  tasks:
+    - name: Set hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+      tags: hostname
+  roles:
+    - role: chrony
+      tags: ntp
+    - role: dhclient
+      tags: dhclient 
+    - role: firewall
+      tags: firawall
+  tags: prepare
+
+- name: DHCP server
+  hosts: masters
+  become: true
+  roles:
+    - role: dnsmasq
+      tags: dhcp
+
+- name: Mesh VPN
+  hosts: all
+  become: true
+  serial: 1
+  roles:
+    - role: tinc
+      tags: tinc 
+
+- name: Seting up Firecracker 
+  hosts: all
+  become: true
+  roles:
+    - role: firecracker
+      tags: firecracker
+    - role: bridge
+      tags: bridge

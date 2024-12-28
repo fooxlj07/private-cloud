@@ -1,0 +1,10 @@
+auto {{ bridge_iface }}
+iface {{ bridge_iface }} inet dhcp
+    bridge_ports none
+    bridge_stp off
+    bridge_fd 0
+    bridge_maxwait 0
+    hwaddress ether {{ bridge_mac_addr }}
+    pre-up ip link add br0 type bridge || true
+    pre-up ip link set {{ vpn_iface }} master {{ bridge_iface }} || true
+    pre-up ip link set {{ firecracker_iface }} master {{ bridge_iface }} || true

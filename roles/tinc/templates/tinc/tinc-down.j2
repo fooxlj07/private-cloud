@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Remove IP and routing. IP must be from /etc/tinc/{{ vpn_name }}/hosts/server*
+# 
+#!/bin/bash
+{% if inventory_hostname == groups['masters'][0] %}
+ip addr del {{ priv_ip }}/{{ subnet_mask }} dev {{ vpn_iface }}
+{% else %}
+dhclient -r {{ vpn_iface }}
+{% endif %}
+
+ip link set {{ vpn_iface }} down
+ip addr flush dev {{ vpn_iface }}

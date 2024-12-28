@@ -1,0 +1,13 @@
+---
+
+priv_ip: "172.16.1.2"
+tinc_mac_addr: "02:42:ac:11:00:02"
+
+bridge_ip: "192.168.100.2"
+bridge_mac_addr: "22:42:ac:11:00:02"
+
+vms_ip_range_start: 192.168.100.51
+vms_ip_range_end: 192.168.100.60
+
+vms_mac_addr_range_start: "53:55:00:02:00:00"
+vms_mac_addr_range_end: "53:55:00:02:00:FF"

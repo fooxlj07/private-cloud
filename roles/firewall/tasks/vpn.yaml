@@ -1,0 +1,42 @@
+---
+
+- name: Flash iptable rules 
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items: [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: Allow tinc tcp traffic
+  iptables:
+    chain: INPUT
+    protocol: tcp 
+    match: tcp
+    destination_port: "{{ vpn_port }}"
+    jump: ACCEPT
+  become: yes
+
+- name: Allow tinc udp traffic
+  iptables:
+    chain: INPUT
+    protocol: udp 
+    match: udp
+    destination_port: "{{ vpn_port }}"
+    jump: ACCEPT
+
+- name: Allow tinc interface
+  iptables:
+    chain: INPUT
+    in_interface: "{{ vpn_iface }}"
+    jump: ACCEPT
+
+- name: Allow tinc interface
+  iptables:
+    chain: FORWARD
+    in_interface: "{{ vpn_iface }}"
+    jump: ACCEPT
+
+- name: Allow tinc interface
+  iptables:
+    chain: OUTPUT
+    out_interface: "{{ vpn_iface }}"
+    jump: ACCEPT

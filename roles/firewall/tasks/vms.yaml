@@ -1,0 +1,40 @@
+--- 
+
+- name: Flush nat table
+  iptables:
+    table: nat
+    chain: '{{ item }}'
+    flush: yes
+  with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'POSTROUTING' ]
+
+- name: Enable NAT on tun0
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    protocol: all
+    out_interface: "{{ vpn_iface }}"
+    jump: MASQUERADE
+    state: present
+
+- name: Allow forwarding from {{ bridge_iface }} to {{ vpn_iface }}
+  iptables:
+    table: filter
+    chain: FORWARD
+    protocol: all
+    in_interface: "{{ bridge_iface }}"
+    out_interface: "{{ vpn_iface }}"
+    jump: ACCEPT
+    state: present
+
+- name: Allow established connections from {{ vpn_iface }} to {{ bridge_iface }}
+  iptables:
+    table: filter
+    chain: FORWARD
+    protocol: all
+    in_interface: "{{ vpn_iface }}"
+    out_interface: "{{ bridge_iface }}"
+    match: state
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+    state: present
+

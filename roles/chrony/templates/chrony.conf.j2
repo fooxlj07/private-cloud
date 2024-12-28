@@ -1,0 +1,7 @@
+server 0.fr.pool.ntp.org iburst
+server 1.fr.pool.ntp.org iburst
+server 2.fr.pool.ntp.org iburst
+server 3.fr.pool.ntp.org iburst
+
+allow {{ vpn_subnet }}
+driftfile /var/lib/chrony/chrony.drift

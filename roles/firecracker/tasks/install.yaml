@@ -1,0 +1,59 @@
+---
+
+- name: Install dependences
+  apt:
+    name: "qemu-utils"
+    state: present
+
+- name: Load modules
+  become: true
+  block: 
+    - name: Load kvm module
+      modprobe:
+        name: kvm
+        state: present 
+        persistent: present
+
+    - name: Load kvm_intel
+      modprobe:
+        name: kvm_intel
+        state: present
+        persistent: present
+
+    - name: Load kvm_intel
+      modprobe:
+        name: irqbypass
+        state: present
+        persistent: present
+
+- name: Install firecracker
+  block:
+    - name: Download the release firecracker
+      get_url: 
+        url: "{{ firecracker_url }}/download/{{ firecracker_version }}/firecracker-{{ firecracker_version }}-{{ ansible_architecture }}.tgz"
+        dest: /tmp/firecracker-{{ firecracker_version }}-{{ ansible_architecture }}.tgz
+    
+    - name: Create tmp dir for firecracker
+      file: 
+        path: /tmp/firecracker
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Extract the firecracker.tgz file
+      unarchive:
+        src: /tmp/firecracker-{{ firecracker_version }}-{{ ansible_architecture }}.tgz
+        dest: /tmp/firecracker
+        remote_src: true
+
+    - name: Copy firecracker to bin folder
+      copy:
+        src: /tmp/firecracker/release-{{ firecracker_version }}-{{ ansible_architecture }}/firecracker-{{ firecracker_version }}-{{ ansible_architecture }}
+        dest: /usr/local/bin/firecracker
+        remote_src: true
+    
+    - name: Make it executable
+      file:
+        path: /usr/local/bin/firecracker
+        mode: '0755'

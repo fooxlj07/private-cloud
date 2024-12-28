@@ -1,0 +1,6 @@
+---
+
+- name: Restart bridge interface
+  shell:
+    cmd: (ifdown {{ bridge_iface }} || true); ifup {{ bridge_iface }}
+

@@ -1,0 +1,9 @@
+--- 
+
+firecracker_version: v1.10.1
+firecracker_url: https://github.com/firecracker-microvm/firecracker/releases
+
+firecracker_files_dir: /root/firecracker_files
+firecracker_rootfs: "ubuntu-24.04"
+
+firecracker_ssh_key: "vms_id_rsa"

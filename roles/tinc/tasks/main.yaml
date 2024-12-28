@@ -1,0 +1,29 @@
+---
+
+
+- name: Setup private network with tinc
+  import_tasks: tinc.yaml
+
+- name: Restart tinc service
+  systemd:
+    name: tinc
+    enabled: true
+    state: restarted
+
+# Restart tinc service after all servers have tinc setup
+- name: Restart tinc service
+  systemd:
+    name: tinc@{{ vpn_name }}
+    enabled: true
+    state: restarted
+  when: "inventory_hostname == 'server03'"
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['nodes'] }}"
+
+- name: Remove buffer
+  file:
+    path: "buffer"
+    state: absent
+  delegate_to: localhost
+  when: "inventory_hostname == 'server03'"
+  ignore_errors: true

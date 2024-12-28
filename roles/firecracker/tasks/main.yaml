@@ -1,0 +1,16 @@
+--- 
+
+- name: Install firecracker
+  import_tasks: install.yaml
+  tags: 
+    - install_fck
+
+- name: Build firecracker kernel and rootfs
+  import_tasks: build.yaml
+  tags:
+    - build_fck
+
+- name: Set firecracker network 
+  import_tasks: network.yaml
+  tags:
+    - network_fck

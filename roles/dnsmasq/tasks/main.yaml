@@ -1,0 +1,25 @@
+---
+
+- name: Stop named dns server
+  systemd:
+    name: named
+    state: stopped
+    enabled: no
+
+- name: Install dnsmasq
+  package:
+    name: dnsmasq
+    state: present
+
+- name: Set dnsmasq config
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf
+    mode: '0644'
+  notify: Restart dnsmasq
+
+- name: Start dnsmasq service
+  systemd:
+    name: dnsmasq
+    state: started
+    enabled: true

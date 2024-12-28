@@ -1,0 +1,5 @@
+---
+
+- name: Restart firecracker iface
+  command:
+    cmd: ifdown tap0 && ifup tap0

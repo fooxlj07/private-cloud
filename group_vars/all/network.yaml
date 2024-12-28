@@ -1,0 +1,25 @@
+---
+
+subnet_mask: 24
+
+# DHCP varaibles 
+dhcp_server_ip: 172.16.1.1
+
+# tinc dhcp range
+vpn_dhcp_range_start_ip: 172.16.1.1
+vpn_dhcp_range_end_ip: 172.16.1.10
+vpn_dhcp_lease_time: 365d
+
+# range for vms
+vms_subnet: 192.168.100.0/24
+vms_dhcp_lease_time: 30d
+bridge_iface: "br0"
+
+# variables for tinc
+vpn_name: "privatecloud"
+vpn_subnet: 172.16.1.0/24
+vpn_port: 655
+
+# variable for iface, which is attach tinc interface and firecracker interfaces
+firecracker_iface: tap0
+vpn_iface: "tun0"

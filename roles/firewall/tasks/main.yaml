@@ -1,0 +1,34 @@
+--- 
+#sudo iptables -A INPUT -p tcp --dport 655 -j ACCEPT
+#sudo iptables -A INPUT -p udp --dport 655 -j ACCEPT
+#sudo iptables -A INPUT -i tun0 -j ACCEPT
+#sudo iptables -A FORWARD -i tun0 -j ACCEPT
+#sudo iptables -A OUTPUT -o tun0 -j ACCEPT
+
+- name: Install iptables
+  apt:
+    pkg:
+      - iptables
+      - iptables-persistent
+
+- name: Set vpn {{ vpn_iface }} rules
+  import_tasks: vpn.yaml
+  tags: iptables_vpn
+
+- name: Set bridge {{ bridge_iface }} and mocrivms {{ firecracker_iface }} rules
+  import_tasks: vms.yaml
+  tags: iptables_vms
+
+- name: Save iptables rules
+  community.general.iptables_state:
+    ip_version: ipv4
+    table: filter
+    state: saved
+    path: /etc/iptables/rules.v4
+
+- name: Save iptables rules
+  community.general.iptables_state:
+    ip_version: ipv4
+    table: nat
+    state: saved
+    path: /etc/iptables/rules.v4
