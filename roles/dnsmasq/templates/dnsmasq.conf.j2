@@ -3,34 +3,5 @@ bind-interfaces
 domain-needed
 bogus-priv
 
-# For tinc 
-interface={{ vpn_iface }}
-
-# For tinc dhcp range
-dhcp-option={{ vpn_iface }},3,172.16.1.1
-dhcp-option={{ vpn_iface }},6,172.16.1.1
-
-dhcp-range={{ vpn_iface }},{{ vpn_dhcp_range_start_ip }},{{ vpn_dhcp_range_end_ip }},{{ vpn_dhcp_lease_time }}
-
-# For tinc private ip
-{% for host in groups['workers'] %}
-dhcp-host={{ hostvars[host]['tinc_mac_addr'] }},{{ hostvars[host]['priv_ip'] }},{{ vpn_dhcp_lease_time }}
-{%  endfor %}
-
-# For bridge
-interface={{ bridge_iface }}
-
-{% for host in groups['nodes'] %}
-dhcp-host={{ hostvars[host]['bridge_mac_addr'] }},{{ hostvars[host]['bridge_ip'] }},{{ vpn_dhcp_lease_time }}
-{%  endfor %}
-
-{% for host in groups['nodes'] %}
-# Vms on {{ host }}
-dhcp-host={{ hostvars[host]['vms_mac_addr_range_start'] }},{{ hostvars[host]['vms_mac_addr_range_end'] }},set:{{ host }}-vm-range
-dhcp-range=set:{{ host }}-vm-range,{{ hostvars[host]['vms_ip_range_start'] }},{{ hostvars[host]['vms_ip_range_end'] }},{{ vms_dhcp_lease_time }}
-
-{%  endfor %}
-
-
 log-dhcp
 log-queries

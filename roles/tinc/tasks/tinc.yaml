@@ -13,23 +13,6 @@
       - "libssl-dev"
       - "tinc"
 
-- name: Clean up 
-  block:
-  - name: Stop tinc service
-    systemd:
-      name: tinc
-      state: stopped
-      enabled: false
-
-  - name: Remove tinc config     
-    file: 
-      path: "/etc/tinc/{{ vpn_name }}"
-      state: absent
-      force: true
-    ignore_errors: true
-
-  tags: clean_tinc
-
 - name: Create tinc/{{ vpn_name }}/hosts folder
   file:
     path: /etc/tinc/{{ vpn_name }}/hosts
@@ -42,6 +25,7 @@
   template:
     src: tinc/tinc.conf.j2
     dest: /etc/tinc/{{ vpn_name }}/tinc.conf
+  tags: tinc_conf
 
 - name: Create tinc hosts folder
   file:

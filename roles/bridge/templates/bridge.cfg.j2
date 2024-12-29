@@ -1,5 +1,11 @@
 auto {{ bridge_iface }}
+{% if priv_ip != dhcp_server_ip%}
 iface {{ bridge_iface }} inet dhcp
+{% else %}
+iface br0 inet static
+    address {{ bridge_ip }}
+    netmask 255.255.255.0
+{% endif %}
     bridge_ports none
     bridge_stp off
     bridge_fd 0

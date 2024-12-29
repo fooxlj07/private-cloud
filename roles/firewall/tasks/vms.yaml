@@ -7,7 +7,7 @@
     flush: yes
   with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'POSTROUTING' ]
 
-- name: Enable NAT on tun0
+- name: Enable NAT on {{ vpn_iface }}
   iptables:
     table: nat
     chain: POSTROUTING

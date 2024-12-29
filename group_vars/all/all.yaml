@@ -1,0 +1,5 @@
+---
+
+# During clean up, if remove_pkg is true, remove the installed pkg
+# -e "remove_pkg=true"
+remove_pkg: false

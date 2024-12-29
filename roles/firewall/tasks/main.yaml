@@ -1,9 +1,9 @@
 --- 
 #sudo iptables -A INPUT -p tcp --dport 655 -j ACCEPT
 #sudo iptables -A INPUT -p udp --dport 655 -j ACCEPT
-#sudo iptables -A INPUT -i tun0 -j ACCEPT
-#sudo iptables -A FORWARD -i tun0 -j ACCEPT
-#sudo iptables -A OUTPUT -o tun0 -j ACCEPT
+#sudo iptables -A INPUT -i tap0 -j ACCEPT
+#sudo iptables -A FORWARD -i tap0 -j ACCEPT
+#sudo iptables -A OUTPUT -o tap0 -j ACCEPT
 
 - name: Install iptables
   apt:

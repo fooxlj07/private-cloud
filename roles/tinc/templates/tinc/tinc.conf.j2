@@ -1,9 +1,9 @@
 Name = {{ inventory_hostname }}
-Device = /dev/net/tun
-StrictSubnets = yes
+Subnet = {{ vpn_subnet }}
 AddressFamily = ipv4
 Interface = {{ vpn_iface }}
 Mode = switch
+DeviceType = tap
 {% for host in groups['nodes'] if host != inventory_hostname %}
 ConnectTo = {{ host }}
 {%  endfor %}

@@ -1,5 +1,5 @@
 ---
 
 - name: Restart firecracker iface
-  command:
-    cmd: ifdown tap0 && ifup tap0
+  shell:
+    cmd: (ifdown {{ firecracker_iface }} || true); ifup {{ firecracker_iface }}

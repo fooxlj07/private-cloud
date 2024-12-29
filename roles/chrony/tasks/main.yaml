@@ -5,6 +5,12 @@
     name: chrony
     state: present
 
+- name: Add chrony dir
+  file:
+    path: /etc/chrony
+    state: directory
+    mode: '0644'
+
 - name: Add chrony config
   template:
     src: chrony.conf.j2

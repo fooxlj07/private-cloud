@@ -3,6 +3,5 @@
 # Attach the {{ vpn_iface }} interface to bridge interface
 ip link set dev {{ vpn_iface }} address {{ tinc_mac_addr }}
 ip link set dev {{ vpn_iface }} up
-{% if inventory_hostname == groups['masters'][0] %}
 ip addr add {{ priv_ip }}/{{ subnet_mask }} dev {{ vpn_iface }}
-{% endif %}
+

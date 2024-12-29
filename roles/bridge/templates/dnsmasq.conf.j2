@@ -1,0 +1,15 @@
+# For bridge
+interface={{ bridge_iface }}
+
+dhcp-range={{ bridge_iface }},{{ bridge_ip_range_start }},{{ bridge_ip_range_end }},{{ bridge_dhcp_lease_time }}
+
+{% for host in groups['nodes'] %}
+dhcp-host={{ hostvars[host]['bridge_mac_addr'] }},{{ hostvars[host]['bridge_ip'] }},{{ bridge_dhcp_lease_time }}
+{%  endfor %}
+
+{% for host in groups['nodes'] %}
+# Vms on {{ host }}
+dhcp-host={{ hostvars[host]['vms_mac_addr_range_start'] }},{{ hostvars[host]['vms_mac_addr_range_end'] }},set:{{ host }}-vm-range
+dhcp-range=set:{{ host }}-vm-range,{{ hostvars[host]['vms_ip_range_start'] }},{{ hostvars[host]['vms_ip_range_end'] }},{{ vms_dhcp_lease_time }}
+
+{%  endfor %}

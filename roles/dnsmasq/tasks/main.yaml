@@ -11,6 +11,12 @@
     name: dnsmasq
     state: present
 
+- name: Create dnsmasq.d 
+  file:
+    path: /etc/dnsmasq.d
+    state: directory 
+    mode: '0644'
+
 - name: Set dnsmasq config
   template:
     src: dnsmasq.conf.j2

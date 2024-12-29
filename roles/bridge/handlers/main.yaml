@@ -4,3 +4,7 @@
   shell:
     cmd: (ifdown {{ bridge_iface }} || true); ifup {{ bridge_iface }}
 
+- name: Restart dnsmasq
+  systemd:
+    name: dnsmasq
+    state: restarted

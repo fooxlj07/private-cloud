@@ -78,6 +78,11 @@
       group: root
       recurse: yes
 
+  - name: Add vms network interface config 
+    template: 
+      src: vm_interface.j2
+      dest: {{ firecracker_files_dir }}/squashfs-root/etc/systemd/network/{{ vm_iface }}.network
+
   - name: Resize file to 400 MB if needed
     command:
       cmd: truncate -s 400M {{ firecracker_files_dir }}/{{ firecracker_rootfs }}.ext4

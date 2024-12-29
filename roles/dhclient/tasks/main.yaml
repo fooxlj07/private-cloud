@@ -8,13 +8,6 @@
       name: isc-dhcp-client
       state: present
 
-  - name: Ensure dhclient send client-id by interface
-    template:
-      src: dhclient.cfg.j2
-      dest: /etc/dhcp/dhclient-{{ item }}.conf
-      mode: "0644"
-    with_items: [ '{{ vpn_iface }}', '{{ bridge_iface }}' ]
-
   - name: Create dhclient hook dir
     file:
       path: /etc/dhcp/dhclient-exit-hooks.d
@@ -31,15 +24,3 @@
       group: root
       mode: '0755'
   tags: dhclient
-
-- name: Enable IP forwarding at runtime
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: "1"
-    state: present
-  tags: ip_forward 
-
-- name: Add dhclient-vpn service
-  import_tasks: dhclient_vpn.yaml
-  tags: dhclient_vpn
-  when: priv_ip != dhcp_server_ip
