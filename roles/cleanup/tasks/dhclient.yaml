@@ -1,0 +1,22 @@
+--- 
+
+- name: Find files in dhcp related to dhclient
+  find:
+    paths: /etc/dhcp
+    patterns: "dhclient.*"
+    file_type: file
+  register: dhclient_files
+
+- name: Remove dhclient files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ dhclient_files.files }}"
+
+- name: Remove package
+  apt:
+    name: isc-dhcp-client
+    state: absent
+    purge: yes
+    update_cache: yes
+  when: remove_pkg

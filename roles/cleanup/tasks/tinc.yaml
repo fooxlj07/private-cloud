@@ -1,0 +1,22 @@
+--- 
+
+- name: Stop tinc service
+  systemd:
+    name: tinc
+    state: stopped
+    enabled: false
+
+- name: Remove tinc config     
+  file: 
+    path: "/etc/tinc/{{ vpn_name }}"
+    state: absent
+    force: true
+  ignore_errors: true
+  
+- name: Remove package
+  apt:
+    name: tinc
+    state: absent
+    purge: yes
+    update_cache: yes
+  when: remove_pkg

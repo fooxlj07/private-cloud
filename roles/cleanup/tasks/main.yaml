@@ -1,0 +1,42 @@
+--- 
+
+- name: Clean tinc
+  import_tasks: tinc.yaml
+  tags: tinc
+
+- name: Disable IP forwarding at runtime
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "0"
+    state: present
+  tags: ip_forward 
+
+- name: Remove bridge
+  import_tasks: bridge.yaml
+  tags: bridge
+
+- name: Firecracker
+  import_tasks: firecracker.yaml
+  tags: firecracker
+
+- name: Clean dhclient_service
+  import_tasks: dhclient_service.yaml
+  tags: dhclient_service
+  when: priv_ip != dhcp_server_ip
+
+- name: Clean dhclient
+  import_tasks: dhclient.yaml
+  tags: dhclient
+
+- name: Clean ntp chrony
+  import_tasks: chrony.yaml
+  tags: ntp
+
+- name: Clean up firewall rules
+  import_tasks: firewall.yaml
+  tags: firewall
+
+- name: DHCP server
+  import_tasks: dnsmasq.yaml
+  tags: dnsmasq
+  when: priv_ip == dhcp_server_ip

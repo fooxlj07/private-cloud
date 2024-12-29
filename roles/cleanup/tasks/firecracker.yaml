@@ -1,0 +1,15 @@
+---
+
+- name: Bring down firecracker network
+  block:
+    - name: Set down bridge {{ firecracker_iface }} 
+      command: ip link set dev {{ firecracker_iface }}  down
+
+    - name: Remove bridge interface {{ firecracker_iface }}
+      command: ip link del dev {{ firecracker_iface }}
+
+    - name: Remove bridge
+      file:
+        path: /etc/network/interfaces.d/{{ firecracker_iface }}.cfg
+        state: absent
+  tags: fck_network

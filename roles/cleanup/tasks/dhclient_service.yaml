@@ -1,0 +1,16 @@
+---
+
+- name: Remove the dhclient-{{ vpn_iface }}.service
+  systemd: 
+    name: dhclient-{{ vpn_iface }}
+    state: stopped
+    enabled: true
+
+- name: Remove service
+  file:
+    path: /etc/systemd/system/dhclient-{{ vpn_iface }}.service
+    state: absent
+
+- name: Reload systemd to apply changes
+  command: systemctl daemon-reload
+

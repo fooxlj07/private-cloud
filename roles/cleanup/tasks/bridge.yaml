@@ -1,0 +1,12 @@
+---
+
+- name: Set down bridge {{ bridge_iface }} 
+  command: ip link set dev {{ bridge_iface }}  down
+
+- name: Remove bridge interface {{ bridge_iface }}
+  command: ip link del dev {{ bridge_iface }}
+
+- name: Remove bridge
+  file:
+    path: /etc/network/interfaces.d/{{ bridge_iface }}.cfg
+    state: absent

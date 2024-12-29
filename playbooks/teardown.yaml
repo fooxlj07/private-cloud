@@ -1,0 +1,16 @@
+---
+
+- name: Clean up local file
+  hosts: localhost
+  tasks:
+    - name: Remove buffer dir
+      file: 
+        path: buffer
+        state: absent
+
+- name: Clean up
+  hosts: all
+  become: true
+  roles:
+    - role: cleanup
+      tags: cleanup

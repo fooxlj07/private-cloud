@@ -1,0 +1,17 @@
+---
+
+- name: Stop dnsmasq service
+  systemd: 
+    name: dnsmasq
+    state: stopped
+    enabled: false
+
+- name: Remove dnsmasq conf
+  file:
+    name: /etc/dnsmasq.conf
+    state: absent
+
+- name: Remove dnsmasq.d
+  file: 
+    name: /etc/dnsmasq.d
+    state: absent

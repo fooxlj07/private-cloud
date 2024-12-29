@@ -1,0 +1,24 @@
+---
+
+- name: Stop chrony 
+  systemd: 
+    name: chrony
+    state: stopped
+    enabled: false
+
+- name: Remove leftover chrony files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/chrony
+    - /etc/chrony.conf
+    - /var/lib/chrony
+    - /var/log/chrony
+
+- name: Remove pkg
+  apt:
+    name: chrony
+    state: absent
+    purge: yes
+  when: remove_pkg
