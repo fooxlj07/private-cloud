@@ -1,0 +1,32 @@
+# Global Datacenter and Node Settings
+datacenter = "{{ consul_cluster }}"              # Specify the datacenter name
+node_name = "{{ inventory_hostname }}"              # Unique name for the node
+bind_addr = "{{ priv_ip }}"           # Tinc VPN private IP for this node (replace with your IP)
+client_addr = "0.0.0.0"          # Allows external Consul API and UI access
+advertise_addr = "{{ priv_ip }}"      # Advertise Tinc VPN IP to other Consul nodes
+
+# Server Configuration (only for Consul servers)
+server = true                    # Set to true if this is a Consul server
+bootstrap_expect = 1             # Number of servers expected in the cluster (adjust as needed)
+# ACL Configuration (Optional but Recommended)
+acl {
+  enabled = true
+  default_policy = "deny"
+  enable_token_persistence = true
+  tokens {
+    default = "{{ consul_server_token }}"
+  }
+}
+
+# Service Mesh (Optional for Secure Communication)
+connect {
+  enabled = true
+}
+
+# Enable UI for Management
+ui = true
+
+# Performance and Logging
+log_file = "{{ consul_log_path }}"
+log_level = "{{ consul_log_level }}"
+data_dir = "{{ consul_data_dir }}"

@@ -2,14 +2,44 @@
 
 - name: Bring down firecracker network
   block:
-    - name: Set down bridge {{ firecracker_iface }} 
+    - name: Set down firecracker {{ firecracker_iface }} 
       command: ip link set dev {{ firecracker_iface }}  down
 
-    - name: Remove bridge interface {{ firecracker_iface }}
+    - name: Remove firecracker interface {{ firecracker_iface }}
       command: ip link del dev {{ firecracker_iface }}
 
-    - name: Remove bridge
+    - name: Remove firecracker
       file:
         path: /etc/network/interfaces.d/{{ firecracker_iface }}.cfg
         state: absent
+  ignore_errors: true
   tags: fck_network
+
+- name: Remove firecracker
+  block:
+    - name: Clean socket {{ firecracker_socket }}
+      file:
+        path: "{{ firecracker_socket }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Remove firecracker_files
+      file:
+        path: "{{ firecracker_files_dir }}"
+        state: absent
+
+    - name: Remove firecracker 
+      file: 
+        path: /usr/local/bin/firecracker
+        state: absent
+
+    - name: Remove firecrecker dirs
+      file:
+        path: /tmp/firecracker
+        state: absent
+    
+    - name: Remove firecrecker tgz
+      file:
+        path: /tmp/firecracker-{{ firecracker_version }}-{{ ansible_architecture }}.tgz
+        state: absent
+  tags: firecracker_files

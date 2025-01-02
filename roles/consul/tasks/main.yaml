@@ -1,0 +1,44 @@
+---
+
+- name: Create {{ consul_user }} user   
+  import_tasks: users.yaml
+  tags: consul_user
+
+- name: Create necessary files
+  import_tasks: files.yaml
+  tags: consul_files
+
+- name: Install consul 
+  import_tasks: install.yaml
+  tags: consul_install
+
+- name: Add consul service
+  import_tasks: consul_service.yaml
+  tags: consul_service
+
+- name: Add consul acl policies
+  import_tasks: acl.yaml
+  tags: consul_acl
+  when: "inventory_hostname in groups['master']"
+
+- name: Set facts 
+  import_tasks: set_facts.yaml
+  tags:
+    - consul_facts
+    - consul_tokens
+    - consul_config
+  when: "inventory_hostname in groups['master']"
+
+- name: Add Policies and tokens
+  include_tasks: 
+    file: policies_tokens.yaml
+    apply:
+      tags: consul_tokens
+  with_items: "{{ consul_policies }}"
+  when:
+    - inventory_hostname in groups['master'] and consul_master_token is defined
+  tags: consul_tokens
+
+- name: Add consul config
+  import_tasks: config.yaml
+  tags: consul_config

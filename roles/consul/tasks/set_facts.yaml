@@ -1,0 +1,25 @@
+---
+    
+- name: Read the consul.env file as the consul user
+  slurp:
+    src: "{{ consul_env_file }}"
+  register: env_file
+
+
+- name: Decode the consul.env content
+  set_fact:
+    decoded_env_content: "{{ env_file.content | b64decode | string }}"
+
+- name: Debug the decoded_env_content
+  debug:
+    msg: "decoded_env_content type: {{ decoded_env_content | type_debug }}"
+
+- name: Split decoded content into lines
+  set_fact:
+    lines: "{{ decoded_env_content | split }}"
+
+- name: Dynamically create individual facts
+  set_fact:
+    "{{ item.split('=')[0] | lower }}": "{{ item.split('=')[1] }}"
+  with_items: "{{ lines }}"
+  when: '"=" in item and not item.startswith("#")'

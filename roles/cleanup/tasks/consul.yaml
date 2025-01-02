@@ -1,0 +1,5 @@
+- name: Stop consul
+  systemd: 
+    name: consul
+    state: stopped
+    enabled: false

@@ -1,0 +1,13 @@
+[Unit]
+Description=Firecracker MicroVM
+After=tinc@{{ vpn_name }}.service
+Requires=tinc@{{ vpn_name }}.service
+
+[Service]
+ExecStart=/usr/local/bin/firecracker --api-sock {{ firecracker_socket }}
+ExecStopPost=/bin/rm -f {{ firecracker_socket }}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=network-online.target

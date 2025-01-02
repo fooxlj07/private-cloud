@@ -3,3 +3,5 @@
 # During clean up, if remove_pkg is true, remove the installed pkg
 # -e "remove_pkg=true"
 remove_pkg: false
+
+project_absolute_path: /home/jli/github/private-cloud

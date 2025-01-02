@@ -1,0 +1,37 @@
+---
+
+- name: Create server config 
+  template:
+    src: consul-server.hcl.j2
+    dest: "{{ consul_config_dir }}/{{ consul_config_file }}"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: "0644"
+  when:
+    - "inventory_hostname in groups['master']"
+    -  consul_server_token is defined
+  notify: Restart consul
+
+- name: Set CONSUL_AGENT_TOKEN on other hosts
+  set_fact:
+    consul_agent_token: "{{ hostvars[groups['master'][0]].consul_agent_token }}"
+
+- name: Debug if inventory_hostname is in workers
+  debug:
+    msg: "{{ inventory_hostname in groups['workers'] }}"
+
+- name: Debug if consul_agent_token is defined
+  debug:
+    msg: "{{ consul_agent_token is defined }}"
+
+- name: Create agent config 
+  template:
+    src: consul-agent.hcl.j2
+    dest: "{{ consul_config_dir }}/{{ consul_config_file }}"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: "0644"
+  when: 
+    - inventory_hostname in groups['workers']
+    - consul_agent_token is defined
+  notify: Restart consul

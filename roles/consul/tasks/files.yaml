@@ -1,0 +1,42 @@
+---
+
+- name: Remove if config dir exist
+  file: 
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ consul_config_dir }}"
+    - "{{ consul_env_file }}"
+    - "{{ consul_log_path }}"
+    - "{{ consul_data_dir }}"
+    - "{{ consul_policies_dir }}"
+    - "{{ consul_tmp_dir }}"
+    - "{{ consul_run_path }}"
+  ignore_errors: true
+  
+
+- name: Create consul dir
+  file: 
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: "0750"
+  with_items:
+    - "{{ consul_config_dir }}"
+    - "{{ consul_data_dir }}"
+    - "{{ consul_policies_dir }}"
+    - "{{ consul_tmp_dir }}"
+    - "{{ consul_run_path }}"
+
+- name: Create files
+  file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: "0644"
+  with_items:
+    - "{{ consul_log_path }}"
+    - "{{ consul_env_file }}"
+

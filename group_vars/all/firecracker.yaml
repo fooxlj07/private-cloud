@@ -7,3 +7,4 @@ firecracker_files_dir: /root/firecracker_files
 firecracker_rootfs: "ubuntu-24.04"
 
 firecracker_ssh_key: "vms_id_rsa"
+firecracker_socket: "/tmp/firecracker.socket"

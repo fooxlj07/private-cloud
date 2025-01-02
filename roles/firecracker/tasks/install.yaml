@@ -57,3 +57,21 @@
       file:
         path: /usr/local/bin/firecracker
         mode: '0755'
+
+- name: Create firecracker service
+  block:
+    - name: Add firecracker service
+      template:
+        src: firecracker_service.j2
+        dest: /etc/systemd/system/firecracker.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start firecracker service
+      systemd_service:
+        name: firecracker
+        state: restarted
+        enabled: true
+        daemon_reload: true
+  tags: fck_service

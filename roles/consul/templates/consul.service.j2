@@ -1,0 +1,23 @@
+[Unit]
+Description=Consul Agent
+Documentation=https://www.consul.io/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+EnvironmentFile={{ consul_env_file }}
+ExecStart={{ consul_bin_path }} agent \
+    -config-file={{ consul_config_dir }}/consul.hcl \
+    -config-dir={{ consul_config_dir }} \
+    -pid-file={{ consul_run_path }}/consul.pid
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGINT
+User=consul
+Group=consul
+LimitNOFILE=65536
+Environment="CONSUL_ALLOW_PRIVILEGED_PORTS=1"
+
+[Install]
+WantedBy=multi-user.target

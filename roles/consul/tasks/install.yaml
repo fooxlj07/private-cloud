@@ -1,0 +1,17 @@
+---
+
+- name: Install consul
+  apt: 
+    name: consul={{ consul_version }}
+    state: present
+
+# For service mesh
+- name: Install envoy 
+  apt:
+    name: envoy
+    state: present
+
+- name: Install jq
+  apt:
+    name: jq
+    state: present

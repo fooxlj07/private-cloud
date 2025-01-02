@@ -14,3 +14,11 @@
   import_tasks: network.yaml
   tags:
     - network_fck
+
+- name: Clean socket {{ firecracker_socket }}
+  file:
+    path: "{{ firecracker_socket }}"
+    state: absent
+  ignore_errors: true
+
+

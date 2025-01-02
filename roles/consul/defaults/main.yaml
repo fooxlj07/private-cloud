@@ -1,0 +1,19 @@
+---
+
+consul_version: 1.20.1-1
+consul_log_level: "INFO"
+consul_user: "consul"
+consul_group: "consul"
+
+consul_bin_path: "/usr/bin/consul"
+consul_config_dir: "/etc/consul.d"
+consul_data_dir: "/var/lib/consul"
+consul_run_path: "/var/run/consul"
+
+consul_config_file: "consul.hcl"
+consul_log_path: "/var/log/consul.log"
+consul_policies_dir: "/etc/consul.d/policies"
+consul_env_file: "/etc/consul.d/consul.env"
+consul_tmp_dir: "/tmp/consul"
+
+envoy_bin_path: "/usr/bin/envoy"

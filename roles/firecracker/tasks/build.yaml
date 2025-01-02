@@ -53,11 +53,6 @@
     shell:
       cmd: unsquashfs -f -d {{ firecracker_files_dir }}/squashfs-root /tmp/{{ firecracker_rootfs }}.squashfs.upstream
 
-  - name: Generate ssh key
-    openssh_keypair:
-      path: "{{ firecracker_files_dir }}/vms_id_rsa"
-      force: true
-
   - name: Ensure .ssh directory exists
     ansible.builtin.file:
       path: "{{ firecracker_files_dir }}/squashfs-root/root/.ssh"
@@ -66,9 +61,8 @@
 
   - name: Copy public key to rootfs
     copy:
-      src: "{{ firecracker_files_dir }}/vms_id_rsa.pub"
+      src: "{{ ssh_key_dir }}/vms_id_rsa.pub"
       dest: "{{ firecracker_files_dir }}/squashfs-root/root/.ssh/authorized_keys"
-      remote_src: true
       mode: '0600'
   
   - name: Change rootfs ownership
@@ -81,7 +75,10 @@
   - name: Add vms network interface config 
     template: 
       src: vm_interface.j2
-      dest: {{ firecracker_files_dir }}/squashfs-root/etc/systemd/network/{{ vm_iface }}.network
+      dest: "{{ firecracker_files_dir }}/squashfs-root/etc/systemd/network/{{ vm_iface }}.network"
+      owner: root
+      group: root
+      mode: '0644'
 
   - name: Resize file to 400 MB if needed
     command:

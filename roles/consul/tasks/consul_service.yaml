@@ -1,0 +1,23 @@
+---
+
+- name: Create consul service
+  template: 
+    src: consul.service.j2
+    dest: /etc/systemd/system/consul.service
+    owner: root
+    group: root
+    mode: 0644
+  register: consul_service
+  notify: Restart consul
+  ignore_errors: true
+ 
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+  when: consul_service is changed
+
+- name: Enable consul service
+  systemd:
+    name: consul
+    enabled: yes
+    masked: no

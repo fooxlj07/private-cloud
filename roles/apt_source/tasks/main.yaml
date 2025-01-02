@@ -1,0 +1,16 @@
+---
+
+- name: Ensure required dependencies are installed
+  apt:
+    name:
+      - gnupg
+    state: present
+    update_cache: yes
+
+- name: Add hashicorp source
+  import_tasks: hashicorp.yaml
+  tags: apt_harshicorp
+
+- name: Add envoy source
+  import_tasks: envoy.yaml
+  tags: apt_envoy

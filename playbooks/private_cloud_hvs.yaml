@@ -1,5 +1,14 @@
 ---
 
+- name: Prepare localhost
+  hosts: localhost
+  tasks:
+    - name: Generate ssh key for vms
+      openssh_keypair:
+        path: "../ssh_key/vms_id_rsa"
+        force: true
+  tags: prepare_local
+
 - name: Prepare servers
   hosts: all
   become: true
@@ -24,12 +33,12 @@
       tags: firawall
   tags: prepare
 
-- name: DHCP server
-  hosts: masters
-  become: true
-  roles:
-    - role: dnsmasq
-      tags: dhcp
+# - name: DHCP server
+#   hosts: master
+#   become: true
+#   roles:
+#     - role: dnsmasq
+#       tags: dhcp
 
 - name: Mesh VPN
   hosts: all
@@ -39,11 +48,23 @@
     - role: tinc
       tags: tinc 
 
-- name: Seting up Firecracker 
+- name: Hashicorp Cluster
   hosts: all
-  become: true
-  roles:
-    - role: firecracker
-      tags: firecracker
-    - role: bridge
-      tags: bridge
+  become: true 
+  roles: 
+    - role: apt_source
+      tags: apt_source
+    - role: consul
+      tags: consul
+
+# Not enough resources, so the cluster won't have the microvms
+# - name: Seting up Firecracker 
+#   hosts: all
+#   become: true
+#   vars: 
+#     ssh_key_dir: "{{ project_absolute_path }}/ssh_key"
+#   roles:
+#     - role: firecracker
+#       tags: firecracker
+#     - role: bridge
+#       tags: bridge

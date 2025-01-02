@@ -1,0 +1,46 @@
+---
+
+- name: Copy policy
+  copy: 
+    src: "{{ item.name }}.hcl"
+    dest: "{{ consul_policies_dir }}/{{ item.name }}.hcl"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: 0644
+  register: copy_result
+
+- name: Create Consul policy
+  shell: >
+    consul acl policy create
+    -name "{{ item.name }}"
+    -description "{{ item.description }}"
+    -rules "@{{ consul_policies_dir }}/{{ item.name }}.hcl"
+    -token "{{ consul_master_token }}"
+  args:
+    executable: /bin/bash
+  register: policy_creation
+  failed_when: policy_creation.rc != 0
+  when: copy_result.changed
+
+- name: Create Consul token
+  shell: >
+    consul acl token create
+    -description "{{ item.token_description }}"
+    -policy-name "{{ item.name }}"
+    -format=json
+    -token "{{ consul_master_token }}"
+  args:
+    executable: /bin/bash
+  register: token_creation
+  failed_when: token_creation.rc != 0
+
+- name: Print the created token
+  debug:
+    var: token_creation.stdout
+
+- name: Update consul.env with the token
+  lineinfile:
+    path: "{{ consul_env_file }}"
+    regexp: "^CONSUL_{{ item.name | upper | replace('-', '_') }}_TOKEN=.*"
+    line: "CONSUL_{{ item.name | upper | replace('-', '_') }}_TOKEN={{ token_creation.stdout | from_json | json_query('SecretID') }}"
+    create: yes

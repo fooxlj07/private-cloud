@@ -1,0 +1,30 @@
+--- 
+
+- name: Generate master token 
+  block: 
+  - name: Check if CONSUL_MASTER_TOKEN exists in consul.env
+    lineinfile:
+      path: /etc/consul.d/consul.env
+      regexp: '^CONSUL_MASTER_TOKEN='
+      state: absent
+    register: token_absent
+    check_mode: true
+    changed_when: false
+
+  - name: Generate master token using ACL bootstrap
+    command: consul acl bootstrap -format=json
+    register: bootstrap_output
+    when: token_absent.found == 0
+
+  - name: Display bootstrap output
+    debug:
+      var: bootstrap_output.stdout
+    when: token_absent.found == 0
+
+  - name: Add master token to consul.env
+    lineinfile:
+      path: /etc/consul.d/consul.env
+      line: "CONSUL_MASTER_TOKEN={{ bootstrap_output.stdout | from_json | json_query('SecretID') }}"
+      create: yes
+      state: present
+    when: token_absent.found == 0
