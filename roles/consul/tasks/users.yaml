@@ -1,6 +1,5 @@
 ---
 
-
 - name: Add Consul group
   group:
     name: "{{ consul_group }}"

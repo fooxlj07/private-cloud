@@ -2,7 +2,7 @@
 
 - name: Copy policy
   copy: 
-    src: "{{ item.name }}.hcl"
+    src: "policies/{{ item.name }}.hcl"
     dest: "{{ consul_policies_dir }}/{{ item.name }}.hcl"
     owner: "{{ consul_user }}"
     group: "{{ consul_group }}"
@@ -33,6 +33,7 @@
     executable: /bin/bash
   register: token_creation
   failed_when: token_creation.rc != 0
+  when: copy_result.changed
 
 - name: Print the created token
   debug:
@@ -44,3 +45,5 @@
     regexp: "^CONSUL_{{ item.name | upper | replace('-', '_') }}_TOKEN=.*"
     line: "CONSUL_{{ item.name | upper | replace('-', '_') }}_TOKEN={{ token_creation.stdout | from_json | json_query('SecretID') }}"
     create: yes
+  when: copy_result.changed
+  

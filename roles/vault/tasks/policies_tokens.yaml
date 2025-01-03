@@ -1,0 +1,48 @@
+---
+
+- name: Copy policy
+  copy: 
+    src: "policies/{{ item.name }}.hcl"
+    dest: "{{ vault_policies_dir }}/{{ item.name }}.hcl"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0644
+  register: copy_result
+
+- name: Create vault policy
+  command: >
+    /bin/bash -c "vault policy write {{ item.name }} {{ vault_policies_dir }}/{{ item.name }}.hcl"
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  register: policy_creation
+  failed_when: policy_creation.rc != 0
+  when: copy_result.changed
+
+- name: debug env
+  debug: 
+    var: policy_creation
+  when: copy_result.changed
+
+- name: Create vault token
+  command: >
+    /bin/bash -c "vault token create -policy={{ item.name }} -format=json"
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  register: token_creation
+  failed_when: token_creation.rc != 0
+  when: copy_result.changed
+
+- name: Print the created token
+  debug:
+    var: token_creation.stdout
+  when: copy_result.changed
+
+- name: Update environment file with token and ID
+  lineinfile:
+    path: "{{ vault_token_env_path }}"
+    regexp: "^VAULT_{{ item.name | upper | replace('-', '_') }}_TOKEN=.*"
+    line: |
+      VAULT_{{ item.name | upper | replace('-', '_') }}_TOKEN={{ token_creation.stdout | from_json | json_query('auth.client_token') }}
+  when: copy_result.changed

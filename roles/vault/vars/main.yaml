@@ -1,0 +1,15 @@
+---
+
+vault_policies:
+  - name: ui
+    description: "Access ui"
+    token_description: "Token to access ui"
+
+  - name: admin
+    description: "Full access for cluster administration" 
+    token_description: "Admin Token"
+  
+  - name: nomad
+    description: "Access for handle nomad secret" 
+    token_description: "Nomad Token"
+  

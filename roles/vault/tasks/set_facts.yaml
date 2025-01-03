@@ -1,0 +1,37 @@
+---
+
+- name: Set admin token as vault token
+  block:
+  - name: Read vaule_token.env
+    slurp:
+      src: "{{ vault_token_env_path }}"
+    register: env_file
+
+  - name: Decode the vault.env content
+    set_fact:
+      vault_env_content: "{{ env_file.content | b64decode | string }}"
+
+  - name: Extract VAULT_ADMIN_TOKEN from the file content
+    set_fact:
+      vault_token: "{{ vault_env_content.splitlines() | select('match', '^VAULT_ADMIN_TOKEN=') | first | regex_replace('^VAULT_ADMIN_TOKEN=(.*)$', '\\1') }}"
+  ignore_errors: true
+
+- name: Set root token as vault_token
+  when: vault_token is not defined
+  block:
+  - name: Read the vault.env file as the vault user
+    slurp:
+      src: "{{ vault_env_path }}"
+    register: env_file
+
+  - name: Decode the vault.env content
+    set_fact:
+      vault_env_content: "{{ env_file.content | b64decode | string }}"
+
+  - name: Extract VAULT_ROOT_TOKEN from the file content
+    set_fact:
+      vault_token: "{{ vault_env_content.splitlines() | select('match', '^VAULT_ROOT_TOKEN=') | first | regex_replace('^VAULT_ROOT_TOKEN=(.*)$', '\\1') }}"
+
+- name: Debug vault
+  debug:
+    msg: "vault_addr = {{ vault_addr }} vault_token = {{ vault_token }}"

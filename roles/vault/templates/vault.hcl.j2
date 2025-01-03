@@ -1,0 +1,24 @@
+cluster_name = "{{ vault_cluster_name }}"
+max_lease_ttl = "{{ vault_max_lease_ttl }}"
+api_addr = "http://{{ priv_ip }}:{{ vault_port }}"
+cluster_addr = "http://{{ priv_ip }}:{{ vault_cluster_port }}"
+ui = true
+
+audit "file" {
+  file_path = "{{ vault_log_path }}" # Path to the audit log file
+  mode      = "0640"                    # File permissions
+}
+
+listener "tcp" {
+  address     = "{{ priv_ip }}:{{ vault_port }}" # Replace x with the server's last IP segment
+  tls_disable = 1
+#  tls_cert_file = "{{ vault_self_assigned_ca_cert_path }}"
+#  tls_key_file  = "{{ vault_self_assigned_ca_key_path }}"
+}
+
+storage "consul" {
+  address = "{{ priv_ip }}:{{ consul_port }}" # Point to your Consul cluster
+  path    = "vault/"
+  token   = "{{ consul_vault_token }}"
+}
+

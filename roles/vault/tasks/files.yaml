@@ -1,0 +1,38 @@
+---
+
+- name: Remove if file exist
+  file: 
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    # - "{{ vault_config_dir }}"
+    # - "{{ vault_data_dir }}"
+    # - "{{ vault_run_dir }}"
+    # - "{{ vault_log_dir }}"
+    - "{{ vault_log_path }}"
+  ignore_errors: true
+
+- name: Create vault dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0750"
+  with_items:
+    - "{{ vault_config_dir }}"
+    - "{{ vault_data_dir }}"
+    - "{{ vault_log_dir }}"
+    - "{{ vault_run_dir }}"
+    - "{{ vault_policies_dir }}"
+
+- name: Create files
+  file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0640"
+  with_items:
+    - "{{ vault_log_path }}"
+    - "{{ vault_token_env_path }}"

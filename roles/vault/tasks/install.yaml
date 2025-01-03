@@ -1,0 +1,6 @@
+---
+
+- name: Install vault
+  apt: 
+    name: vault={{ vault_version }}
+    state: present

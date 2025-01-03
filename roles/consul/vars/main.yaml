@@ -1,7 +1,7 @@
 ---
 
 consul_policies:
-  - name: ui-policy
+  - name: ui
     description: "Access ui"
     token_description: "Token to access ui"
 
@@ -14,5 +14,9 @@ consul_policies:
     token_description: "Agent Token"
 
   - name: server
+    description: "Server Coordinate Write Access"
+    token_description: "Agent Token"
+
+  - name: vault
     description: "Server Coordinate Write Access"
     token_description: "Agent Token"

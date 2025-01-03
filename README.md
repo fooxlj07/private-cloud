@@ -12,3 +12,14 @@ pipenv install
 pipenv shell
 
 `ansible-galaxy collection install -r requirements.yml`
+access vault ui
+ssh -L 8200:172.16.1.1:8200 root@server01
+
+access consul ui
+ssh -L 8500:172.16.1.1:8500 root@server01
+
+TODO:
+- dns record
+- loadbalance/reverse proxy
+- OpenVPN remote and local
+- proper ca, may use let's encrypt

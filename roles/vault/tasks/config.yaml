@@ -1,0 +1,31 @@
+--- 
+
+- name: Get consul vault token
+  block:
+    - name: Read the consul.env file as the consul user
+      slurp:
+        src: "{{ consul_env_file }}"
+      register: env_file
+
+    - name: Decode the consul.env content
+      set_fact:
+        decoded_env_content: "{{ env_file.content | b64decode | string }}"
+    
+    - name: Set consul_vault_token
+      set_fact:
+        consul_vault_token: "{{ decoded_env_content | regex_search('CONSUL_VAULT_TOKEN=(.*)', '\\1') }}"
+  when: "inventory_hostname in groups['master']"
+
+- name: Set consul_vault_token
+  set_fact: 
+    consul_vault_token: "{{ hostvars[groups['master'][0]].consul_vault_token[0] }}"
+
+- name: Set config 
+  template: 
+    src: vault.hcl.j2
+    dest: "{{ vault_config_path }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: "0644"
+  notify: Restart vault
+  when: consul_vault_token is defined

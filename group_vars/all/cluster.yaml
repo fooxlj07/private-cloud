@@ -1,3 +1,9 @@
 ---
 
 consul_cluster: "my-cluster"
+consul_port: 8500
+
+vault_port: 8200
+
+vault_addr: "http://{{ priv_ip }}:{{ vault_port }}"
+consul_http_addr: "http://{{ priv_ip }}:{{ consul_port }}"

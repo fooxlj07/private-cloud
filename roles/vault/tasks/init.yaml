@@ -1,0 +1,77 @@
+---
+
+- name: Check if {{ vault_env_path }} exists
+  stat:
+    path: "{{ vault_env_path }}"
+  register: vault_env_file
+
+- name: Run Vault operator init
+  command: > 
+    vault operator init  
+    -format=json
+  register: vault_init_output
+  environment:
+    CONSUL_HTTP_ADDR: "http://{{ priv_ip }}:{{ consul_port }}"  
+    VAULT_ADDR: "http://{{ priv_ip }}:{{ vault_port }}"
+  ignore_errors: no
+  when: not vault_env_file.stat.exists
+
+- name: Get the vault_init.json content
+  set_fact:
+    vault_init_data: "{{ vault_init_output.output }}"
+
+- name: Extract root token
+  set_fact:
+    root_token: "{{ vault_init_data['root_token'] }}"
+
+- name: Debug root_token file content
+  debug:
+    var: root_token
+
+
+- name: Extract unseal keys
+  set_fact:
+    unseal_keys: "{{ vault_init_data['unseal_keys_b64'] }}"
+
+- name: Debug unseal keys file content
+  debug:
+    var: unseal_keys
+
+- name: Unseal threshhold
+  set_fact: 
+    unseal_threshold: "{{ vault_init_data['unseal_threshold'] }}"
+
+- name: Debug unseal_threshold file content
+  debug:
+    var: unseal_threshold
+
+- name: Unseal vault 
+  shell: vault operator unseal {{ item }}
+  environment: 
+    VAULT_ADDR: "{{ vault_addr }}"
+  with_items: "{{ unseal_keys[:unseal_threshold | int] }}"
+  register: unseal_result
+
+- name: Debug unseal results
+  debug:
+    var: unseal_results
+
+- name: Prepare unseal keys as environment variables
+  set_fact:
+    vault_unseal_env: |
+      VAULT_ROOT_TOKEN="{{ root_token }}"
+      {% for i in range(0, unseal_keys | length) %}
+      VAULT_UNSEAL_KEY_{{ i + 1 }}={{ unseal_keys[i] }}
+      {% endfor %}
+
+- name: Debug vault.env file content
+  debug:
+    var: vault_unseal_env
+
+- name: Save root token and unseal keys to /etc/vault.d/vault.env
+  copy:
+    dest: "{{ vault_env_path }}"
+    content: "{{ vault_unseal_env }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: '0600'

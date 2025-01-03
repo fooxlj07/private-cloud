@@ -10,11 +10,9 @@
     - "{{ consul_log_path }}"
     - "{{ consul_data_dir }}"
     - "{{ consul_policies_dir }}"
-    - "{{ consul_tmp_dir }}"
-    - "{{ consul_run_path }}"
+    - "{{ consul_run_dir }}"
   ignore_errors: true
   
-
 - name: Create consul dir
   file: 
     path: "{{ item }}"
@@ -27,7 +25,7 @@
     - "{{ consul_data_dir }}"
     - "{{ consul_policies_dir }}"
     - "{{ consul_tmp_dir }}"
-    - "{{ consul_run_path }}"
+    - "{{ consul_run_dir }}"
 
 - name: Create files
   file:

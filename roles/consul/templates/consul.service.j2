@@ -5,17 +5,19 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 EnvironmentFile={{ consul_env_file }}
 ExecStart={{ consul_bin_path }} agent \
     -config-file={{ consul_config_dir }}/consul.hcl \
     -config-dir={{ consul_config_dir }} \
-    -pid-file={{ consul_run_path }}/consul.pid
+    -pid-file={{ consul_pid_path }}
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=5
 KillSignal=SIGINT
-User=consul
-Group=consul
+User={{ consul_user }}
+Group={{ consul_group }}
 LimitNOFILE=65536
 Environment="CONSUL_ALLOW_PRIVILEGED_PORTS=1"
 

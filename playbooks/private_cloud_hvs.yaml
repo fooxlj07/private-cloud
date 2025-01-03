@@ -56,6 +56,8 @@
       tags: apt_source
     - role: consul
       tags: consul
+    - role: vault
+      tags: vault
 
 # Not enough resources, so the cluster won't have the microvms
 # - name: Seting up Firecracker 

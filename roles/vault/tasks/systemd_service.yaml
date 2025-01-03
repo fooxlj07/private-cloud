@@ -1,0 +1,23 @@
+---
+
+- name: Create vault service
+  template: 
+    src: vault.service.j2
+    dest: /etc/systemd/system/vault.service
+    owner: root
+    group: root
+    mode: 0644
+  register: vault_service
+  notify: Restart vault
+  ignore_errors: true
+ 
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+  when: vault_service is changed
+
+- name: Enable vault service
+  systemd:
+    name: vault
+    enabled: yes
+    masked: no

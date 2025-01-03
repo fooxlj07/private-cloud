@@ -1,0 +1,62 @@
+---
+
+- name: Create {{ vault_user }} user   
+  import_tasks: users.yaml
+  tags: vault_user
+
+- name: Create necessary files
+  import_tasks: files.yaml
+  tags: vault_files
+
+- name: Install vault 
+  import_tasks: install.yaml
+  tags: vault_install
+
+- name: Add vault service
+  import_tasks: systemd_service.yaml
+  tags: vault_service
+
+- name: Add vault config
+  import_tasks: config.yaml
+  tags: vault_config
+
+- name: Init vault
+  import_tasks: init.yaml
+  tags: vault_init
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    CONSUL_HTTP_ADDR: "{{ consul_http_addr }}"
+  when: "inventory_hostname in groups['master']"
+
+- name: Set facts 
+  import_tasks: set_facts.yaml
+  tags:
+    - vault_facts
+    - vault_tokens
+    - vault_cleanup
+  when: "inventory_hostname in groups['master']"
+
+- name: Add Policies and tokens
+  include_tasks: 
+    file: policies_tokens.yaml
+    apply:
+      tags: vault_tokens
+  with_items: "{{ vault_policies }}"
+  when:
+    - inventory_hostname in groups['master']
+    - vault_token is defined
+  tags: vault_tokens
+
+- name: Revoke root token
+  command: >
+    "vault token revoke {{ vault_token }}"
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  register: revoke_output
+  tags: vault_cleanup
+
+- name: Debug revoke output
+  debug:
+    var: revoke_output.stdout
+  tags: vault_cleanup
