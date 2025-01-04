@@ -26,7 +26,6 @@
   environment:
     VAULT_ADDR: "{{ vault_addr }}"
     CONSUL_HTTP_ADDR: "{{ consul_http_addr }}"
-  when: "inventory_hostname in groups['master']"
 
 - name: Set facts 
   import_tasks: set_facts.yaml
