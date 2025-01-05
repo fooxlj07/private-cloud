@@ -20,6 +20,7 @@
     group: "{{ vault_group }}"
     mode: "0750"
   with_items:
+    - "{{ vault_root_ca_dir }}"
     - "{{ vault_config_dir }}"
     - "{{ vault_data_dir }}"
     - "{{ vault_log_dir }}"

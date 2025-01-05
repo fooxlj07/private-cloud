@@ -1,0 +1,43 @@
+--- 
+
+# - name: Enable PKI secrets engine
+#   command:
+#     cmd: vault secrets enable -path=pki pki
+#   register: enable_pki_result
+
+# - name: Configure PKI maximum TTL
+#   command:
+#     cmd: vault secrets tune -max-lease-ttl={{ vault_pki_lease_ttl }} pki
+#   when: enable_pki_result is succeeded
+
+- name: Generate Root CA certificate
+  command: 
+    cmd: >
+      vault write -format=json pki/root/generate/internal
+      common_name="Root CA"
+      ttl={{ vault_root_ca_ttl }}
+  register: root_ca_result
+
+# Step 4: Save the Root CA Certificate
+- name: Save Root CA certificate to file
+  copy:
+    content: "{{ root_ca_result.stdout | from_json | json_query('data.certificate') }}"
+    dest: "{{ vault_root_ca_dir }}/root_ca.pem"
+    mode: "0644"
+  when: root_ca_result.stdout | from_json | json_query('data.certificate') is defined
+
+# Step 5: Save the Root CA Private Key
+- name: Save Root CA private key to file
+  copy:
+    content: "{{ root_ca_result.stdout | from_json | json_query('data.private_key') }}"
+    dest: "{{ vault_root_ca_dir }}/root_ca.key"
+    mode: "0600"
+  when: root_ca_result.stdout | from_json | json_query('data.private_key') is defined
+
+# Step 6: Set Certificate Distribution and CRL URLs
+- name: Configure CRL and Issuing Certificate URLs
+  command:
+    cmd: >
+      vault write pki/config/urls
+      issuing_certificates="{{ vault_addr }}/v1/pki/ca"
+      crl_distribution_points="{{ vault_addr }}/v1/pki/crl"

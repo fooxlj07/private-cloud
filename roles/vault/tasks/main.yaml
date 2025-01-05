@@ -50,8 +50,8 @@
   command: >
     "vault token revoke {{ vault_token }}"
   environment:
-    VAULT_ADDR: "{{ vault_addr }}"
-    VAULT_TOKEN: "{{ vault_token }}"
+    VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
+    VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
   register: revoke_output
   tags: vault_cleanup
 
@@ -59,3 +59,11 @@
   debug:
     var: revoke_output.stdout
   tags: vault_cleanup
+
+- name: Enable PKI
+  import_tasks: pki.yaml
+  tags: vault_pki
+  environment:
+    VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
+    VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
+  when: "inventory_hostname in groups['master']"

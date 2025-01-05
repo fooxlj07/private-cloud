@@ -9,6 +9,7 @@ vault_data_dir: "/opt/vault/data"
 vault_run_dir: "/var/run/vault"
 vault_bin_path: "/usr/bin/vault"
 vault_cluster_name: "my_vault_cluster"
+vault_root_ca_dir: "/etc/vault.d/certificate"
 
 vault_max_lease_ttl: 365d
 vault_log_dir: "/var/log/vault"
@@ -23,3 +24,7 @@ vault_self_assigned_ca_cert_path: "/opt/vault/tls/tls.crt"
 vault_self_assigned_ca_key_path: "/opt/vault/tls/tls.key"
 
 vault_token_env_path: "/etc/vault.d/vault_token.env"
+
+vault_pki_lease_ttl: "87600h"
+vault_ca_ttl: "2190h"
+vault_root_ca_ttl: "87600h"
