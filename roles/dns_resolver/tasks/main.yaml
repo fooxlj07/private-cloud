@@ -1,0 +1,10 @@
+---
+
+- name: Add dns server to resolv.conf if not present
+  lineinfile:
+    path: /etc/resolv.conf
+    line: "{{ nameserver_line }}"
+    insertafter: "^search"
+    state: present
+  vars:
+    nameserver_line: "nameserver {{ '127.0.0.1' if inventory_hostname in groups['dns_server'] else hostvars[groups['dns_server'][0]].priv_ip }}"

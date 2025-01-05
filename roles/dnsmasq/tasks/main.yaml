@@ -24,6 +24,12 @@
     mode: '0644'
   notify: Restart dnsmasq
 
+- name: Set cluster config
+  template:
+    src: cluster.conf.j2
+    dest: /etc/dnsmasq.d/cluster.conf
+  notify: Restart dnsmasq
+
 - name: Start dnsmasq service
   systemd:
     name: dnsmasq

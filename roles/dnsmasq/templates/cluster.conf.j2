@@ -1,0 +1,28 @@
+# Bind dnsmasq to the Tinc interface only
+interface={{ vpn_iface }}
+bind-interfaces
+
+# Define the private domain
+domain={{ domain_name }}
+
+# Static IP mappings for Consul cluster nodes
+address=/consul.{{ domain_name }}/{{ hostvars[groups['master'][0]]['priv_ip'] }}
+address=/consul.{{ domain_name }}/::1
+
+# Static IP mappings for Vault cluster nodes
+{% for host in groups['nodes'] %}
+address=/vault.{{ domain_name }}/{{ hostvars[host]['priv_ip'] }}
+{% endfor %}
+address=/vault.{{ domain_name }}/::1
+
+# Static IP mappings for Vault cluster nodes
+{% for host in groups['nodes'] %}
+address=/nomad.{{ domain_name }}/{{ hostvars[host]['priv_ip'] }}
+{% endfor %}
+address=/nomad.{{ domain_name }}/::1
+
+# Prevent forwarding private domain queries to upstream DNS servers
+local=/{{ domain_name }}/
+
+# Block DNS rebinding attacks
+bogus-priv
