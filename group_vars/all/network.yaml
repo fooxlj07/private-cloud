@@ -21,10 +21,16 @@ bridge_dhcp_lease_time: 365d
 # variables for tinc
 vpn_name: "privatecloud"
 vpn_subnet: 172.16.1.0/24
+vpn_subnet_id: "172.16.1.0"
 vpn_port: 655
 
 # variable for iface, which is attach tinc interface and firecracker interfaces
 firecracker_iface: tap1
 vpn_iface: tap0
 
-# TODO: change to tap0
+domain_name: my-cluster.internal
+dns_server: 172.16.1.1
+dns_log_path: "/var/log/dnsmasq.log"
+
+openvpn_subnet: "172.16.100.0/24"
+openvpn_subnet_id: "172.16.100.0"

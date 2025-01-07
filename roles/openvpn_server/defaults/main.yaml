@@ -1,0 +1,24 @@
+---
+
+openvpn_port: 1194
+openvpn_protocol: udp
+openvpn_iface: tap1
+openvpn_user: "openvpn"
+openvpn_group: "openvpn"
+
+openvpn_role_max_ttl: "8760h"
+openvpn_dns: "openvpn.{{ domain_name }}"
+
+openvpn_config_dir: "/etc/openvpn"
+openvpn_config_server_dir: "/etc/openvpn/server"
+openvpn_config_client_dir: "/tmp/openvpn/client"
+
+openvpn_log_dir: "/var/log/openvpn"
+openvpn_status_log_path: "{{ openvpn_log_dir }}/status.log"
+openvpn_log_path: "{{ openvpn_log_dir }}/openvpn.log"
+openvpn_log_level: 3
+easyrsa_ca_dir: "/etc/openvpn/easy-rsa"
+openvpn_client_name: "{{ lookup('env', 'OPENVPN_CLIENT') }}"
+
+
+openvpn_subnet: 10.8.0.0

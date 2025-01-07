@@ -67,3 +67,11 @@
     VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
     VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
   when: "inventory_hostname in groups['master']"
+
+- name: Create intermediate ca for cluster 
+  import_tasks: cluster_intermediate_ca.yaml
+  tags: vault_intermediate_ca
+  environment:
+    VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
+    VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
+  when: "inventory_hostname in groups['master']"

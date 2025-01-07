@@ -15,9 +15,9 @@
   import_tasks: vpn.yaml
   tags: iptables_vpn
 
-- name: Set bridge {{ bridge_iface }} and mocrivms {{ firecracker_iface }} rules
-  import_tasks: vms.yaml
-  tags: iptables_vms
+# - name: Set bridge {{ bridge_iface }} and mocrivms {{ firecracker_iface }} rules
+#   import_tasks: vms.yaml
+#   tags: iptables_vms
 
 - name: Save iptables rules
   community.general.iptables_state:

@@ -12,6 +12,9 @@ pipenv install
 pipenv shell
 
 `ansible-galaxy collection install -r requirements.yml`
+
+provide VAULT_ADDR and VAULT_TOKEN env
+
 access vault ui
 ssh -L 8200:172.16.1.1:8200 root@server01
 then check on local browser http://localhost:8200/ui
@@ -21,10 +24,11 @@ ssh -L 8500:172.16.1.1:8500 root@server01
 then check on local browser http://localhost:8500/ui
 
 TODO:
-- secret management instead of .env file for root secret during init(used later as well for recovery)
+- secret management instead of .env and root ca of vault file for root secret during init(used later as well for recovery) !!!
 - OpenVPN remote and local
 - internal domain name dns record
 - proper ca, may use let's encrypt
 - loadbalance/reverse proxy
 - check with dedibox if can get a domain name without lose my servers
 - log and monitory
+- add log rotation.

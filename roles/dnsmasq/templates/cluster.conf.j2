@@ -10,16 +10,8 @@ address=/consul.{{ domain_name }}/{{ hostvars[groups['master'][0]]['priv_ip'] }}
 address=/consul.{{ domain_name }}/::1
 
 # Static IP mappings for Vault cluster nodes
-{% for host in groups['nodes'] %}
-address=/vault.{{ domain_name }}/{{ hostvars[host]['priv_ip'] }}
-{% endfor %}
+address=/vault.{{ domain_name }}/{{ hostvars[groups['master'][0]]['priv_ip'] }}
 address=/vault.{{ domain_name }}/::1
-
-# Static IP mappings for Vault cluster nodes
-{% for host in groups['nodes'] %}
-address=/nomad.{{ domain_name }}/{{ hostvars[host]['priv_ip'] }}
-{% endfor %}
-address=/nomad.{{ domain_name }}/::1
 
 # Prevent forwarding private domain queries to upstream DNS servers
 local=/{{ domain_name }}/

@@ -1,0 +1,29 @@
+--- 
+
+- name: Create {{ openvpn_user }} user   
+  import_tasks: users.yaml
+  tags: openvpn_user
+
+- name: Create necessary dir files
+  import_tasks: files.yaml
+  tags: openvpn_files
+
+- name: Install openvpn
+  import_tasks: install.yaml
+  tags: openvpn_install
+
+- name: Add iptables rules
+  import_tasks: iptables.yaml
+  tags: openvpn_iptables
+
+- name: Openvpn certificate
+  import_tasks: certificate.yaml
+  tags: openvpn_cert
+
+- name: Config openvpn
+  import_tasks: config.yaml
+  tags: openvpn_config
+
+- name: Add openvpn service
+  import_tasks: service.yaml
+  tags: openvpn_service

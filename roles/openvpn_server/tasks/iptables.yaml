@@ -1,0 +1,27 @@
+---
+
+- name: Flush nat table
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ openvpn_subnet }}"
+    out_interface: "{{ ansible_default_ipv4['interface'] }}"
+    jump: MASQUERADE
+    state: absent
+  ignore_errors: true
+
+- name: Enable NAT on open vpn {{ openvpn_subnet }}
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ openvpn_subnet }}"
+    out_interface: "{{ ansible_default_ipv4['interface'] }}"
+    jump: MASQUERADE
+    state: present
+
+- name: Save iptables rules
+  community.general.iptables_state:
+    ip_version: ipv4
+    table: nat
+    state: saved
+    path: /etc/iptables/rules.v4

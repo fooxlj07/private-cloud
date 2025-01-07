@@ -1,0 +1,14 @@
+---
+
+- name: Add openvpn group
+  group:
+    name: "{{ openvpn_group }}"
+    state: present
+
+# Add user
+- name: Add openvpn user
+  user:
+    name: "{{ openvpn_user }}"
+    comment: "openvpn user"
+    group: "{{ openvpn_user }}"
+    system: true

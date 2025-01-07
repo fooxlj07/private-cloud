@@ -1,0 +1,19 @@
+---
+
+- name: Install open vpn
+  apt:
+    name: openvpn
+    state: present
+
+- name: Install easy-rsa
+  apt:
+    name: easy-rsa
+    state: present
+
+- name: Move easyrsa to bin
+  copy: 
+    src: "/usr/share/easy-rsa/easyrsa"
+    dest: "/usr/local/bin/easyrsa"
+    mode: "0755"
+    remote_src: true
+

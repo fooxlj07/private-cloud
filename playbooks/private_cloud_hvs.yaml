@@ -33,12 +33,20 @@
       tags: firawall
   tags: prepare
 
-# - name: DHCP server
-#   hosts: master
-#   become: true
-#   roles:
-#     - role: dnsmasq
-#       tags: dhcp
+- name: DNS server
+  hosts: master
+  become: true
+  roles:
+    - role: dnsmasq
+      tags: dns
+
+- name: DNS client
+  hosts: all
+  become: true
+  roles:
+    - role: dns_resolver
+      tags: 
+        - dns_client
 
 - name: Mesh VPN
   hosts: all
@@ -58,6 +66,7 @@
       tags: consul
     - role: vault
       tags: vault
+
 
 # Not enough resources, so the cluster won't have the microvms
 # - name: Seting up Firecracker 

@@ -1,0 +1,78 @@
+---
+
+- name: Enable PKI intemediate secrets engine
+  command:
+    cmd: vault secrets enable -path=pki_int pki
+  register: enable_pki_int_result
+
+- name: Configure PKI intermediata maximum TTL
+  command:
+    cmd: vault secrets tune -max-lease-ttl={{ vault_pki_int_lease_ttl }} pki_int
+  when: enable_pki_int_result is succeeded
+# First time run for no Cluster setup
+# Later use role certificates to renew or generate ca
+
+- name: Generate intermediate CA
+  command:
+    cmd: >
+      vault write -format=json pki_int/intermediate/generate/internal 
+      common_name="Cluster Intermediate CA" 
+      ttl={{ cluster_intermediate_ca_ttl }}
+  register: intermediate_csr
+
+- name: Debug intermediate_csr
+  debug:
+    var: intermediate_csr
+
+- name: Save Intermediate CA CSR to file
+  copy:
+    content: "{{ intermediate_csr.stdout | from_json | json_query('data.csr') }}"
+    dest: "{{ cluster_intermediate_csr_path }}"
+
+- name: Sign Intermediate CA with Root CA
+  command:
+    cmd: >
+      vault write -format=json pki/root/sign-intermediate
+      csr=@{{ cluster_intermediate_csr_path }}
+      format=pem_bundle
+      ttl={{ cluster_intermediate_ca_ttl }}
+  register: signed_intermediate
+
+- name: Debug signed_intermediate
+  debug:
+    var: signed_intermediate
+
+- name: Save signed Intermediate CA to file
+  copy:
+    content: "{{ signed_intermediate.stdout | from_json | json_query('data.certificate') }}"
+    dest: "{{ cluster_intermediate_crt_path }}"
+
+- name: Import Signed Intermediate Certificate into Vault
+  command:
+    cmd: >
+      vault write pki_int/intermediate/set-signed
+      certificate=@{{ cluster_intermediate_crt_path }}
+  register: set_signed_result
+
+- name: Debug set_signed_result
+  debug:
+    var: set_signed_result  
+
+- name: Configure CRL and Issuing Certificate URLs
+  command:
+    cmd: >
+      vault write pki_int/config/urls
+      issuing_certificates="{{ vault_addr }}/v1/pki_int/ca"
+      crl_distribution_points="{{ vault_addr }}/v1/pki_int/crl"
+
+- name: Remove Signed Intermediate Certificate
+  file:
+    path: "{{ cluster_intermediate_csr_path }}"
+    state: absent
+  when: set_signed_result.rc == 0
+
+- name: Remove Signed Intermediate Certificate
+  file:
+    path: "{{ cluster_intermediate_crt_path }}"
+    state: absent
+  when: set_signed_result.rc == 0

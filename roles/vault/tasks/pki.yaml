@@ -1,14 +1,14 @@
 --- 
 
-# - name: Enable PKI secrets engine
-#   command:
-#     cmd: vault secrets enable -path=pki pki
-#   register: enable_pki_result
+- name: Enable PKI secrets engine
+  command:
+    cmd: vault secrets enable pki
+  register: enable_pki_result
 
-# - name: Configure PKI maximum TTL
-#   command:
-#     cmd: vault secrets tune -max-lease-ttl={{ vault_pki_lease_ttl }} pki
-#   when: enable_pki_result is succeeded
+- name: Configure PKI maximum TTL
+  command:
+    cmd: vault secrets tune -max-lease-ttl={{ vault_pki_lease_ttl }} pki
+  when: enable_pki_result is succeeded
 
 - name: Generate Root CA certificate
   command: 
@@ -26,15 +26,7 @@
     mode: "0644"
   when: root_ca_result.stdout | from_json | json_query('data.certificate') is defined
 
-# Step 5: Save the Root CA Private Key
-- name: Save Root CA private key to file
-  copy:
-    content: "{{ root_ca_result.stdout | from_json | json_query('data.private_key') }}"
-    dest: "{{ vault_root_ca_dir }}/root_ca.key"
-    mode: "0600"
-  when: root_ca_result.stdout | from_json | json_query('data.private_key') is defined
-
-# Step 6: Set Certificate Distribution and CRL URLs
+# Step 5: Set Certificate Distribution and CRL URLs
 - name: Configure CRL and Issuing Certificate URLs
   command:
     cmd: >

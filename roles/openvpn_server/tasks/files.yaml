@@ -1,0 +1,33 @@
+--- 
+
+- name: Create necessary dirs
+  file: 
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: "0700"
+  with_items:
+    - "{{ openvpn_config_dir }}"
+    - "{{ openvpn_config_client_dir }}"
+    - "{{ easyrsa_ca_dir }}"
+    - "{{ openvpn_log_dir }}"
+
+- name: Create server dir 
+  file:
+    path: "{{ openvpn_config_server_dir }}"
+    state: directory
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: "0700"
+
+- name: Create files
+  file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: "0640"
+  with_items:
+    - "{{ openvpn_status_log_path }}"
+    - "{{ openvpn_log_path }}"
