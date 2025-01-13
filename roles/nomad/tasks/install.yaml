@@ -1,0 +1,6 @@
+---
+
+- name: Install nomad
+  apt:
+    name: nomad={{ nomad_version }}
+    state: present

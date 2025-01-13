@@ -1,0 +1,21 @@
+---
+
+- name: Create nomad dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: "0755"
+  with_items:
+    - "{{ nomad_config_dir }}"
+    - "{{ nomad_data_dir }}"
+    - "{{ nomad_log_dir }}"
+    - "{{ nomad_alloc_dir }}"
+    - "{{ nomad_alloc_mount_dir }}"
+
+- name: Create a symbolic link for alloc_mounts
+  file:
+    src: "{{ nomad_alloc_mount_dir }}"
+    dest: "{{ nomad_alloc_mount_link_dir }}"
+    state: link

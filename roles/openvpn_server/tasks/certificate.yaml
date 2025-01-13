@@ -1,89 +1,89 @@
 ---
 
-# - name: Init pki
-#   command:
-#     cmd: easyrsa init-pki
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki"
+- name: Init pki
+  command:
+    cmd: easyrsa init-pki
+    chdir: "{{ easyrsa_ca_dir }}"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki"
 
-# - name: Set OpenVPN client name from environment variable
-#   set_fact:
-#     openvpn_client_name: "{{ lookup('env', 'OPENVPN_CLIENT') }}"
+- name: Set OpenVPN client name from environment variable
+  set_fact:
+    openvpn_client_name: "{{ lookup('env', 'OPENVPN_CLIENT') }}"
 
-# - name: Add vars file for easyrsa
-#   template:
-#     src: easyrsa_vars.j2
-#     dest: "{{ easyrsa_ca_dir }}/pki/vars"
-#     owner: "{{ openvpn_user }}"
-#     group: "{{ openvpn_group }}"
-#     mode: '0644'
+- name: Add vars file for easyrsa
+  template:
+    src: easyrsa_vars.j2
+    dest: "{{ easyrsa_ca_dir }}/pki/vars"
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: '0644'
 
-# - name: Generate dh.pem
-#   command:
-#     cmd: easyrsa gen-dh
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki/dh.pem"
+- name: Generate dh.pem
+  command:
+    cmd: easyrsa gen-dh
+    chdir: "{{ easyrsa_ca_dir }}"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/dh.pem"
 
-# - name: Build the CA
-#   command:
-#     cmd: easyrsa build-ca nopass
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki/ca.crt"
+- name: Build the CA
+  command:
+    cmd: easyrsa build-ca nopass
+    chdir: "{{ easyrsa_ca_dir }}"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/ca.crt"
 
-# - name: Generate server key and CSR
-#   command:
-#     cmd: easyrsa --req-cn="{{ domain_name }}-OpenVPN Server CA" gen-req server nopass
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki/private/server.key"
+- name: Generate server key and CSR
+  command:
+    cmd: easyrsa --req-cn="{{ domain_name }}-OpenVPN Server CA" gen-req server nopass
+    chdir: "{{ easyrsa_ca_dir }}"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/private/server.key"
 
-# - name: Sign server certificate
-#   command:
-#     cmd: easyrsa sign-req server server
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   environment:
-#     EASYRSA_BATCH: "1"  # Skip interactive prompts
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki/issued/server.crt"
+- name: Sign server certificate
+  command:
+    cmd: easyrsa sign-req server server
+    chdir: "{{ easyrsa_ca_dir }}"
+  environment:
+    EASYRSA_BATCH: "1"  # Skip interactive prompts
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/issued/server.crt"
 
-# - name: Generate client key and CSR
-#   command:
-#     cmd: easyrsa --req-cn="{{ domain_name }}-OpenVPN Client CA" gen-req {{ openvpn_client_name }} nopass
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki/private/{{ openvpn_client_name }}.key"
+- name: Generate client key and CSR
+  command:
+    cmd: easyrsa --req-cn="{{ domain_name }}-OpenVPN Client CA" gen-req {{ openvpn_client_name }} nopass
+    chdir: "{{ easyrsa_ca_dir }}"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/private/{{ openvpn_client_name }}.key"
 
-# - name: Sign client certificate
-#   command:
-#     cmd: easyrsa sign-req client {{ openvpn_client_name }}
-#     chdir: "{{ easyrsa_ca_dir }}"
-#   environment:
-#     EASYRSA_BATCH: "1"
-#   args:
-#     creates: "{{ easyrsa_ca_dir }}/pki/issued/{{ openvpn_client_name }}.crt"
+- name: Sign client certificate
+  command:
+    cmd: easyrsa sign-req client {{ openvpn_client_name }}
+    chdir: "{{ easyrsa_ca_dir }}"
+  environment:
+    EASYRSA_BATCH: "1"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/issued/{{ openvpn_client_name }}.crt"
 
-# - name: Distribute server certificates
-#   copy:
-#     src: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     remote_src: true
-#   with_items:
-#     - { src: "{{ easyrsa_ca_dir }}/pki/ca.crt", dest: "{{ openvpn_config_server_dir }}/ca.crt" }
-#     - { src: "{{ easyrsa_ca_dir }}/pki/issued/server.crt", dest: "{{ openvpn_config_server_dir }}/server.crt" }
-#     - { src: "{{ easyrsa_ca_dir }}/pki/private/server.key", dest: "{{ openvpn_config_server_dir }}/server.key" }
-#     - { src: "{{ easyrsa_ca_dir }}/pki/dh.pem", dest: "{{ openvpn_config_server_dir }}/dh.pem" }
+- name: Distribute server certificates
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: true
+  with_items:
+    - { src: "{{ easyrsa_ca_dir }}/pki/ca.crt", dest: "{{ openvpn_config_server_dir }}/ca.crt" }
+    - { src: "{{ easyrsa_ca_dir }}/pki/issued/server.crt", dest: "{{ openvpn_config_server_dir }}/server.crt" }
+    - { src: "{{ easyrsa_ca_dir }}/pki/private/server.key", dest: "{{ openvpn_config_server_dir }}/server.key" }
+    - { src: "{{ easyrsa_ca_dir }}/pki/dh.pem", dest: "{{ openvpn_config_server_dir }}/dh.pem" }
 
-# - name: Distribute client certificates
-#   fetch:
-#     src: "{{ item.src }}"
-#     dest: "{{ playbook_dir }}/{{ item.dest }}"
-#   with_items:
-#     - { src: "{{ easyrsa_ca_dir }}/pki/ca.crt", dest: "openvpn_client_ca/ca.crt" }
-#     - { src: "{{ easyrsa_ca_dir }}/pki/issued/{{ openvpn_client_name }}.crt", dest: "openvpn_client_ca/{{ openvpn_client_name }}.crt" }
-#     - { src: "{{ easyrsa_ca_dir }}/pki/private/{{ openvpn_client_name }}.key", dest: "openvpn_client_ca/{{ openvpn_client_name }}.key" }
+- name: Distribute client certificates
+  fetch:
+    src: "{{ item.src }}"
+    dest: "{{ playbook_dir }}/{{ item.dest }}"
+  with_items:
+    - { src: "{{ easyrsa_ca_dir }}/pki/ca.crt", dest: "openvpn_client_ca/ca.crt" }
+    - { src: "{{ easyrsa_ca_dir }}/pki/issued/{{ openvpn_client_name }}.crt", dest: "openvpn_client_ca/{{ openvpn_client_name }}.crt" }
+    - { src: "{{ easyrsa_ca_dir }}/pki/private/{{ openvpn_client_name }}.key", dest: "openvpn_client_ca/{{ openvpn_client_name }}.key" }
 
 - name: Set correct permission for key
   file:

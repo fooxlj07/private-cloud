@@ -9,14 +9,22 @@ consul_policies:
     description: "Full access for cluster administration" 
     token_description: "Admin Token"
 
-  - name: agent
-    description: "Agent Coordinate Write Access"
-    token_description: "Agent Token"
+  - name: consul-agent
+    description: "Consul Agent Coordinate Write Access"
+    token_description: "Consul Agent Token"
 
-  - name: server
-    description: "Server Coordinate Write Access"
-    token_description: "Agent Token"
+  - name: consul-server
+    description: "Consul server Coordinate Write Access"
+    token_description: "Consul server Token"
 
   - name: vault
-    description: "Server Coordinate Write Access"
-    token_description: "Agent Token"
+    description: "Vault access"
+    token_description: "Vault Token"
+
+  - name: nomad-server-client
+    description: "Nomad server client access"
+    token_description: "Nomad server client Token"
+
+  - name: nomad-client
+    description: "Nomad client access"
+    token_description: "Nomad client Token"

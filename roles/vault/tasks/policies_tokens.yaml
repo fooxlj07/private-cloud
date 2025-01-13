@@ -24,6 +24,21 @@
     var: policy_creation
   when: copy_result.changed
 
+- name: Create role if needed 
+  command: >
+    vault write auth/approle/role/{{ item.role }} 
+    policies={{ item.name }} 
+    token_ttl={{ item.token_ttl }} 
+    token_max_ttl={{ item.token_max_ttl }}
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  register: role_creation
+  failed_when: role_creation.rc != 0
+  when: 
+    - copy_result.changed
+    - item.role is defined
+
 - name: Create vault token
   command: >
     /bin/bash -c "vault token create -policy={{ item.name }} -format=json"

@@ -13,6 +13,9 @@ address=/consul.{{ domain_name }}/::1
 address=/vault.{{ domain_name }}/{{ hostvars[groups['master'][0]]['priv_ip'] }}
 address=/vault.{{ domain_name }}/::1
 
+# Static IP mapping for nomad cluster nodes
+address=/nomad.{{ domain_name }}/{{ hostvars[groups['master'][0]]['priv_ip'] }}
+address=/nomad.{{ domain_name }}/::1
 # Prevent forwarding private domain queries to upstream DNS servers
 local=/{{ domain_name }}/
 

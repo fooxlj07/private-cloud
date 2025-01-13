@@ -2,14 +2,18 @@
 
 vault_policies:
   - name: ui
-    description: "Access ui"
-    token_description: "Token to access ui"
 
   - name: admin
-    description: "Full access for cluster administration" 
-    token_description: "Admin Token"
-  
+
+  - name: consul
+    role: consul
+    token_ttl: 1h
+    token_max_ttl: 4h
+    auth_path: consul
+
   - name: nomad
-    description: "Access for handle nomad secret" 
-    token_description: "Nomad Token"
+    role: nomad
+    token_ttl: 1h
+    token_max_ttl: 4h
+    auth_path: nomad
   

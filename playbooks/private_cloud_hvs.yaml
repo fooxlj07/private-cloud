@@ -66,7 +66,10 @@
       tags: consul
     - role: vault
       tags: vault
-
+    - role: docker
+      tags: docker
+    - role: nomad
+      tags: nomad
 
 # Not enough resources, so the cluster won't have the microvms
 # - name: Seting up Firecracker 

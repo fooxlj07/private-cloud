@@ -1,36 +1,47 @@
 ---
 
-- name: Init vault
+- name: Check if {{ vault_init_json_path }} exists
   when: "inventory_hostname in groups['master']"
+  stat:
+    path: "{{ vault_init_json_path }}"
+  register: vault_init_json_path
+
+- name: Init vault
+  when: 
+    - "inventory_hostname in groups['master']"
+    - not vault_init_json_path.stat.exists
   block: 
-  - name: Check if {{ vault_env_path }} exists
-    stat:
-      path: "{{ vault_env_path }}"
-    register: vault_env_file
+  - name: Run Vault operator init
+    command: > 
+      vault operator init  
+      -format=json
+    register: vault_init_output
+    ignore_errors: no
 
-  # - name: Run Vault operator init
-  #   command: > 
-  #     vault operator init  
-  #     -format=json
-  #   register: vault_init_output
-  #   environment:
-  #     CONSUL_HTTP_ADDR: "http://{{ priv_ip }}:{{ consul_port }}"  
-  #     VAULT_ADDR: "http://{{ priv_ip }}:{{ vault_port }}"
-  #   ignore_errors: no
-  #   when: not vault_env_file.stat.exists
-
-  # - name: Get the vault_init.json content
-  #   set_fact:
-  #     vault_init_data: "{{ vault_init_output.stdout }}"
-
-  - name: Read vaule_token.env
-    slurp:
-      src: "/tmp/vault_init.json"
-    register: env_file
-
-  - name: Decode the vault_init content
+  - name: Get the vault_init.json content
     set_fact:
-      vault_init_data: "{{ env_file.content | b64decode | from_json }}"
+      vault_init_data: "{{ vault_init_output.stdout }}"
+  
+  - name: Write vault_init.json content
+    copy:
+      dest: "{{ vault_init_json_path }}"
+      content: "{{ vault_init_data }}"
+      mode: '0644'
+
+- name: Set facts
+  when: "inventory_hostname in groups['master']"
+  block:
+  - name: Read vault json
+    command: cat /tmp/vault_init.json
+    register: env_file   
+
+  - name: Debug vault json
+    debug:
+      var: env_file
+
+  - name: get the vault_init content
+    set_fact:
+      vault_init_data: "{{ env_file.stdout | from_json }}"
 
   - name: Extract root token
     set_fact:
@@ -62,6 +73,7 @@
         {% for i in range(0, unseal_keys | length) %}
         VAULT_UNSEAL_KEY_HEX{{ i + 1 }}={{ unseal_keys_hex[i] }}
         {% endfor %}
+
 
   - name: Debug vault.env file content
     debug:
@@ -97,7 +109,7 @@
 - name: Unseal vault 
   shell: vault operator unseal {{ item }}
   environment: 
-    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_ADDR: "http://{{priv_ip}}:{{ vault_port }}"
   with_items: "{{ unseal_keys[:unseal_threshold | int] }}"
   register: unseal_result
 

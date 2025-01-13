@@ -26,6 +26,7 @@
   environment:
     VAULT_ADDR: "{{ vault_addr }}"
     CONSUL_HTTP_ADDR: "{{ consul_http_addr }}"
+ 
 
 - name: Set facts 
   import_tasks: set_facts.yaml
@@ -34,6 +35,17 @@
     - vault_tokens
     - vault_cleanup
   when: "inventory_hostname in groups['master']"
+
+- name: Enable auth path if needed
+  command: >
+    vault auth enable approle
+  environment:
+    VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
+    VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
+  register: approle_enable
+  failed_when: approle_enable.rc != 0
+  when: "inventory_hostname in groups['master']"
+  tags: vault_approle
 
 - name: Add Policies and tokens
   include_tasks: 
@@ -46,19 +58,19 @@
     - vault_token is defined
   tags: vault_tokens
 
-- name: Revoke root token
-  command: >
-    "vault token revoke {{ vault_token }}"
-  environment:
-    VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
-    VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
-  register: revoke_output
-  tags: vault_cleanup
+# - name: Revoke root token
+#   command: >
+#     "vault token revoke {{ vault_token }}"
+#   environment:
+#     VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
+#     VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
+#   register: revoke_output
+#   tags: vault_cleanup
 
-- name: Debug revoke output
-  debug:
-    var: revoke_output.stdout
-  tags: vault_cleanup
+# - name: Debug revoke output
+#   debug:
+#     var: revoke_output.stdout
+#   tags: vault_cleanup
 
 - name: Enable PKI
   import_tasks: pki.yaml

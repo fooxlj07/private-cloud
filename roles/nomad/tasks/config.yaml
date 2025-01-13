@@ -1,0 +1,25 @@
+---
+
+- name: Create server config
+  template: 
+    src: nomad_server.hcl.j2
+    dest: "{{ nomad_config_dir }}/nomad.hcl"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: "0644"
+  when:
+    - "inventory_hostname in groups['master']"
+    - consul_nomad_srv_client_token is defined
+  notify: Restart nomad
+
+- name: Create client config 
+  template:
+    src: nomad_client.hcl.j2
+    dest: "{{ nomad_config_dir }}/nomad.hcl"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: "0644"
+  when: 
+    - inventory_hostname in groups['workers']
+    - consul_nomad_client_token is defined
+  notify: Restart nomad

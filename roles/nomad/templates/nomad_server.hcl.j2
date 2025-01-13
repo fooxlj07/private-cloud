@@ -1,0 +1,57 @@
+# General Nomad configuration
+datacenter = "{{ datacenter }}"
+region     = "{{ nomad_region }}"
+data_dir   = "{{ nomad_data_dir }}"
+
+bind_addr = "{{ priv_ip }}"
+
+ports {
+  rpc = {{ nomad_rpc_port }}
+  http = {{ nomad_http_port }}
+  serf = {{ nomad_serf_port }}
+}
+
+advertise {
+  rpc = "{{ priv_ip }}:{{ nomad_rpc_port }}" # Ensure the advertise RPC address is reachable
+}
+
+# Enable the server role
+server {
+  enabled          = true
+  bootstrap_expect = 1  # Single server setup for now
+}
+
+# Enable the client role
+client {
+  enabled = true
+  alloc_dir = "{{ nomad_alloc_dir }}"
+  # Specify network interfaces
+  network_interface = "{{ vpn_iface }}"
+  options = {
+    "docker.privileged.enabled" = "true"
+  }
+  meta {
+    "node-role" = "worker"
+    "datacenter" = "lab"
+  }
+}
+
+# Enable Consul integration
+consul {
+  enabled = true
+  address = "{{ consul_http_addr }}"
+  token   = "{{ consul_nomad_srv_client_token }}"  # Replace with your Consul token
+  server_service_name = "nomad"
+  server_auto_join = true
+  client_service_name = "nomad-client"
+  client_auto_join = true
+}
+
+# Enable Vault integration
+vault {
+  enabled = true
+  address = "{{ vault_addr }}"
+}
+
+# Logging
+log_level = "{{ nomad_log_level }}"

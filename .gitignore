@@ -3,3 +3,4 @@ ssh_key/*
 .vault*
 
 openvpn_client_ca
+ansible_collections

@@ -1,8 +1,8 @@
 # Global Datacenter and Node Settings
-datacenter = "{{ consul_cluster }}"              # Specify the datacenter name
+datacenter = "{{ datacenter }}"              # Specify the datacenter name
 node_name = "{{ inventory_hostname }}"              # Unique name for the node
 bind_addr = "{{ priv_ip }}"           # Tinc VPN private IP for this node (replace with your IP)
-client_addr = "0.0.0.0"          # Allows external Consul API and UI access
+client_addr = "{{ priv_ip }}"          # Allows external Consul API and UI access
 advertise_addr = "{{ priv_ip }}"      # Advertise Tinc VPN IP to other Consul nodes
 
 # Server Configuration (only for Consul servers)

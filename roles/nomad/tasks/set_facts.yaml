@@ -1,0 +1,29 @@
+---
+
+- name: Get consul nomad token
+  block:
+    - name: Read the consul.env file as the consul user
+      slurp:
+        src: "{{ consul_env_file }}"
+      register: env_file
+
+    - name: Decode the consul.env content
+      set_fact:
+        decoded_env_content: "{{ env_file.content | b64decode | string }}"
+    
+    - name: Set consul_nomad_srv_client_token
+      set_fact:
+        consul_nomad_srv_client_token: "{{ decoded_env_content | regex_search('CONSUL_NOMAD_SERVER_CLIENT_TOKEN=(.*)', '\\1') }}"
+
+    - name: Set consul_nomad_client_token
+      set_fact:
+        consul_nomad_client_token: "{{ decoded_env_content | regex_search('CONSUL_NOMAD_CLIENT_TOKEN=(.*)', '\\1') }}"
+  when: "inventory_hostname in groups['master']"
+
+- name: Set consul_nomad_srv_client_token
+  set_fact: 
+    consul_nomad_srv_client_token: "{{ hostvars[groups['master'][0]].consul_nomad_srv_client_token[0] }}"
+
+- name: Set consul_nomad_srv_client_token
+  set_fact: 
+    consul_nomad_client_token: "{{ hostvars[groups['master'][0]].consul_nomad_client_token[0] }}"

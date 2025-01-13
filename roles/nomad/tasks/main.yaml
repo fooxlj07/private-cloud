@@ -1,0 +1,27 @@
+---
+
+- name: Add nomad user
+  import_tasks: users.yaml
+  tags: nomad_user
+
+- name: Install nomad
+  import_tasks: install.yaml
+  tags: nomad_install
+
+- name: Add nomad files dirs
+  import_tasks: files.yaml
+  tags: nomad_files
+
+- name: Add nomad service
+  import_tasks: service.yaml
+  tags: nomad_service
+
+- name: Set facts
+  import_tasks: set_facts.yaml
+  tags: 
+    - nomad_fact
+    - nomad_config
+
+- name: Set nomad config
+  import_tasks: config.yaml
+  tags: nomad_config 

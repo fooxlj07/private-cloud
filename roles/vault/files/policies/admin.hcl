@@ -4,5 +4,5 @@ path "sys/*" {
 }
 
 path "*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
