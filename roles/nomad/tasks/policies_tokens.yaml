@@ -1,0 +1,56 @@
+---
+
+- name: Copy policy
+  copy: 
+    src: "policies/{{ item.name }}.hcl"
+    dest: "{{ nomad_policy_dir }}/{{ item.name }}.hcl"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: 0644
+  register: copy_result
+
+- name: Create nomad {{ item.name }} policy
+  shell: >
+    nomad acl policy apply {{ item.name }} {{ nomad_policy_dir }}/{{ item.name }}.hcl
+  environment:
+    NOMAD_ADDR: "{{ nomad_addr }}"
+    NOMAD_TOKEN: "{{ nomad_token}}"
+  args:
+    executable: /bin/bash
+  register: policy_creation
+  failed_when: policy_creation.rc != 0
+  when: copy_result.changed
+
+- name: debug env
+  debug: 
+    var: policy_creation
+  when: copy_result.changed
+
+- name: Create nomad token
+  shell: > 
+    nomad acl token create
+    -name="{{ item.name }}"
+    -policy="{{ item.name }}"
+    -type="client" 
+    -json
+  environment:
+    NOMAD_ADDR: "{{ nomad_addr }}"
+    NOMAD_TOKEN: "{{ nomad_token}}"
+  args:
+    executable: /bin/bash
+  register: token_creation
+  failed_when: token_creation.rc != 0
+  when: copy_result.changed
+
+- name: Print the created token
+  debug:
+    var: token_creation.stdout
+  when: copy_result.changed
+
+- name: Update environment file with token and ID
+  lineinfile:
+    path: "{{ nomad_env_file }}"
+    regexp: "^NOMAD_{{ item.name | upper | replace('-', '_') }}_TOKEN=.*"
+    line: |
+      NOMAD_{{ item.name | upper | replace('-', '_') }}_TOKEN={{ (token_creation.stdout | from_json).SecretID }}
+  when: copy_result.changed

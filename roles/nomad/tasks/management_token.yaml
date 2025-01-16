@@ -1,0 +1,24 @@
+---
+
+- name: Create management token
+  shell: >
+    nomad acl token create 
+    -name="management-token" 
+    -type="management" 
+    -global=true
+    -json
+  args:
+    executable: /bin/bash
+  register: token_creation
+  failed_when: token_creation.rc != 0
+
+- name: Extract Nomad management token
+  set_fact:
+    management_token: "{{ (token_creation.stdout | from_json).SecretID }}"
+
+- name: Add NOMAD_MANAGEMENT_TOKEN to nomad.env
+  lineinfile:
+    path: /etc/nomad.d/nomad.env
+    regexp: '^NOMAD_MANAGEMENT_TOKEN='
+    line: "NOMAD_MANAGEMENT_TOKEN={{ management_token }}"
+    state: present

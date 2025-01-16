@@ -18,3 +18,4 @@
     name: nomad
     groups: docker
     append: yes
+

@@ -2,8 +2,9 @@
 
 consul_port: 8500
 vault_port: 8200
-
+nomad_port: 4646
 
 vault_addr: "http://vault.{{ domain_name }}:{{ vault_port }}"
 consul_http_addr: "http://consul.{{ domain_name }}:{{ consul_port }}"
+nomad_addr: "http://nomad.{{ domain_name }}:{{ nomad_port }}"
 datacenter: "lab"

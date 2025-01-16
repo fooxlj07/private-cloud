@@ -1,0 +1,8 @@
+---
+
+nomad_policies:
+  - name: ui
+
+  - name: admin
+
+  - name: ci-deploy

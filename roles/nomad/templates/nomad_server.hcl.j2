@@ -27,9 +27,11 @@ client {
   alloc_dir = "{{ nomad_alloc_dir }}"
   # Specify network interfaces
   network_interface = "{{ vpn_iface }}"
+  
   options = {
-    "docker.privileged.enabled" = "true"
+    "docker.numa.enabled" = "false"
   }
+
   meta {
     "node-role" = "worker"
     "datacenter" = "lab"
@@ -51,6 +53,10 @@ consul {
 vault {
   enabled = true
   address = "{{ vault_addr }}"
+}
+
+acl {
+  enabled = true
 }
 
 # Logging

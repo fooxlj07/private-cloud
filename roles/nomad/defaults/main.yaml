@@ -10,6 +10,8 @@ nomad_log_dir: "/var/log/nomad"
 nomad_alloc_dir: "/opt/nomad/alloc"
 nomad_alloc_mount_dir: "/opt/nomad/alloc_mounts"
 nomad_alloc_mount_link_dir: "/opt/alloc_mounts"
+nomad_policy_dir: "/etc/nomad.d/policies"
+nomad_env_file: "/etc/nomad.d/nomad.env"
 
 nomad_run_path: "/usr/bin/nomad"
 

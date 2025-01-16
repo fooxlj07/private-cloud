@@ -13,6 +13,7 @@
     - "{{ nomad_log_dir }}"
     - "{{ nomad_alloc_dir }}"
     - "{{ nomad_alloc_mount_dir }}"
+    - "{{ nomad_policy_dir }}"
 
 - name: Create a symbolic link for alloc_mounts
   file:

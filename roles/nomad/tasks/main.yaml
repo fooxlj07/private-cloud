@@ -21,7 +21,34 @@
   tags: 
     - nomad_fact
     - nomad_config
+    - nomad_tokens
+    - nomad_management_token
 
 - name: Set nomad config
   import_tasks: config.yaml
   tags: nomad_config 
+
+- name: Bootstarp nomad acl
+  import_tasks: acl_init.yaml
+  tags: nomad_acl_init
+  when: "inventory_hostname in groups['master']"
+  environment:
+    NOMAD_ADDR: "{{ nomad_addr }}"
+
+- name: Management token
+  import_tasks: management_token.yaml
+  tags: nomad_management_token
+  when: "inventory_hostname in groups['master']"
+  environment:
+    NOMAD_ADDR: "{{ nomad_addr }}"
+    NOMAD_TOKEN: "{{ nomad_token }}"
+
+- name: Add Policies and tokens
+  include_tasks: 
+    file: policies_tokens.yaml
+    apply:
+      tags: nomad_tokens
+  with_items: "{{ nomad_policies }}"
+  when:
+    - inventory_hostname in groups['master'] and nomad_token is defined
+  tags: nomad_tokens

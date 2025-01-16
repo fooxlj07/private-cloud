@@ -27,3 +27,35 @@
 - name: Set consul_nomad_srv_client_token
   set_fact: 
     consul_nomad_client_token: "{{ hostvars[groups['master'][0]].consul_nomad_client_token[0] }}"
+
+- name: Set admin token as nomad token
+  block:
+  - name: Read nomad.env
+    slurp:
+      src: "{{ nomad_env_file }}"
+    register: env_file
+
+  - name: Decode the nomad.env content
+    set_fact:
+      nomad_env_content: "{{ env_file.content | b64decode | string }}"
+
+  - name: Extract NOMAD_MANAGEMENT_TOKEN from the file content
+    set_fact:
+      nomad_token: "{{ nomad_env_content.splitlines() | select('match', '^NOMAD_MANAGEMENT_TOKEN=') | first | regex_replace('^NOMAD_ADMIN_TOKEN=(.*)$', '\\1') }}"
+  ignore_errors: true
+
+- name: Set root token as nomad token
+  when: nomad is not defined
+  block:
+  - name: Read the nomad.env file as the nomad user
+    slurp:
+      src: "{{ nomad_env_file }}"
+    register: env_file
+
+  - name: Decode the nomad.env content
+    set_fact:
+      nomad_env_content: "{{ env_file.content | b64decode | string }}"
+
+  - name: Extract NOMAD_ROOT_TOKEN from the file content
+    set_fact:
+      nomad_token: "{{ nomad_env_content.splitlines() | select('match', '^NOMAD_ROOT_TOKEN=') | first | regex_replace('^NOMAD_ROOT_TOKEN=(.*)$', '\\1') }}"

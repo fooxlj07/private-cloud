@@ -1,0 +1,29 @@
+--- 
+
+- name: Check if NOMAD_ROOT_TOKEN exists in nomad.env
+  lineinfile:
+    path: "{{ nomad_env_file }}"
+    state: absent
+    regexp: '^NOMAD_ROOT_TOKEN='
+  register: token_check
+  check_mode: yes
+  changed_when: false
+
+- name: Bootstrap nomad acl
+  shell: >
+    nomad acl bootstrap -json
+  register: bootstrap
+  when: token_check.found == 0
+
+- name: Extract Nomad bootstrap token
+  set_fact:
+    nomad_token: "{{ (bootstrap.stdout | from_json).SecretID }}"
+  when: token_check.found == 0
+
+- name: Add NOMAD_ROOT_TOKEN to nomad.env
+  lineinfile:
+    path: /etc/nomad.d/nomad.env
+    regexp: '^NOMAD_ROOT_TOKEN='
+    line: "NOMAD_ROOT_TOKEN={{ nomad_token }}"
+    state: present
+  when: token_check.found == 0
