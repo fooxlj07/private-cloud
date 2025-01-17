@@ -1,6 +1,6 @@
 port {{ openvpn_port }}
 proto {{ openvpn_protocol }}
-dev {{ openvpn_iface }}
+dev tap
 
 ca {{ openvpn_config_server_dir }}/ca.crt
 cert {{ openvpn_config_server_dir }}/server.crt
@@ -16,12 +16,16 @@ cipher AES-256-GCM
 data-ciphers AES-256-GCM:AES-128-GCM
 data-ciphers-fallback AES-256-CBC
 
-topology subnet
-server {{ openvpn_subnet }} 255.255.255.0
-ifconfig-pool-persist /var/log/openvpn/ipp.txt
-server {{ openvpn_subnet_id }} 255.255.255.0  # OpenVPN subnet
+# Enable DHCP relay, delegate IP assignment to dnsmasq
+mode server
+dev tap
+server-bridge {{ openvpn_gw_ip }} 255.255.255.0 {{ openvpn_ip_range_start }} {{ openvpn_ip_range_end }}
+ifconfig {{ openvpn_gw_ip }} 255.255.255.0
+client-to-client
+
+# Push routes and DNS for VPN clients
+push "route {{ vpn_subnet_id }} 255.255.255.0"
 push "redirect-gateway def1"
-push "route {{ vpn_subnet_id }} 255.255.255.0"  
 push "dhcp-option DNS {{ dns_server }}"
 
 persist-key

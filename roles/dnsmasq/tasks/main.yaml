@@ -30,6 +30,12 @@
     dest: /etc/dnsmasq.d/cluster.conf
   notify: Restart dnsmasq
 
+- name: Set cluster config
+  template:
+    src: openvpn.conf.j2
+    dest: /etc/dnsmasq.d/openvpn.conf
+  notify: Restart dnsmasq
+
 - name: Start dnsmasq service
   systemd:
     name: dnsmasq

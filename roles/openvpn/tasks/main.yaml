@@ -27,3 +27,7 @@
 - name: Add openvpn service
   import_tasks: service.yaml
   tags: openvpn_service
+
+- name: Openvpn client ca and keys 
+  import_tasks: client_cert.yaml
+  tags: openvpn_client_cert

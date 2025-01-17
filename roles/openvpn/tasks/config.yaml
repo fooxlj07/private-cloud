@@ -1,0 +1,10 @@
+--- 
+
+- name: Add openvpn config
+  template:
+    src: openvpn.conf.j2
+    dest: "{{ openvpn_config_server_dir }}/openvpn.conf"
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: '0644'
+  notify: Restart openvpn

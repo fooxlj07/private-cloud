@@ -2,7 +2,7 @@
 
 openvpn_port: 1194
 openvpn_protocol: udp
-openvpn_iface: tap1
+
 openvpn_user: "openvpn"
 openvpn_group: "openvpn"
 

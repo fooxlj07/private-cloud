@@ -1,0 +1,18 @@
+# ----------------------------------------
+# OpenVPN-specific dnsmasq configuration
+# ----------------------------------------
+
+# Bind dnsmasq to OpenVPN's TAP interface only
+interface={{ openvpn_iface }}
+
+# DHCP range for OpenVPN clients (subnet: 172.16.100.0/24)
+dhcp-range={{ openvpn_iface }},{{ openvpn_ip_range_start }},{{ openvpn_ip_range_end }},255.255.255.0,{{ openvpn_dhcp_lease_time }}
+
+# Gateway for OpenVPN clients
+dhcp-option={{ openvpn_iface }},3,{{ openvpn_gw_ip }}
+
+# DNS server for OpenVPN clients (points to dnsmasq itself)
+dhcp-option={{ openvpn_iface }},6,{{ dns_server }}
+
+# Search domain for OpenVPN clients
+dhcp-option={{ openvpn_iface }},15,{{ domain_name }}

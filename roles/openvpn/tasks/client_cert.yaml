@@ -1,0 +1,31 @@
+---
+
+- name: Generate client key and CSR
+  command:
+    cmd: easyrsa --req-cn="{{ domain_name }}-OpenVPN Client CA" gen-req {{ openvpn_client_name }} nopass
+    chdir: "{{ easyrsa_ca_dir }}"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/private/{{ openvpn_client_name }}.key"
+  tags: openvpn_client
+
+- name: Sign client certificate
+  command:
+    cmd: easyrsa sign-req client {{ openvpn_client_name }}
+    chdir: "{{ easyrsa_ca_dir }}"
+  environment:
+    EASYRSA_BATCH: "1"
+  args:
+    creates: "{{ easyrsa_ca_dir }}/pki/issued/{{ openvpn_client_name }}.crt"
+  tags: openvpn_client
+
+- name: Distribute client certificates
+  fetch:
+    src: "{{ item.src }}"
+    dest: "{{ playbook_dir }}/{{ item.dest }}"
+    flat: yes
+  with_items:
+    # - { src: "{{ easyrsa_ca_dir }}/pki/ca.crt", dest: "openvpn_client_ca/ca.crt" }
+    # - { src: "{{ easyrsa_ca_dir }}/pki/issued/{{ openvpn_client_name }}.crt", dest: "openvpn_client_ca/{{ openvpn_client_name }}.crt" }
+    # - { src: "{{ easyrsa_ca_dir }}/pki/private/{{ openvpn_client_name }}.key", dest: "openvpn_client_ca/{{ openvpn_client_name }}.key" }
+    - { src: "{{ openvpn_config_server_dir }}/ta.key", dest: "openvpn_client_ca/ta.key"}
+  tags: openvpn_fetch

@@ -4,9 +4,6 @@
 
 - name: Config openvpn server
   hosts: openvpn_server
-  environment:
-    VAULT_ADDR: "{{ lookup('env', 'VAULT_ADDR') }}"
-    VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
   roles:
-    - role: openvpn_server
-      tags: openvpn_server
+    - role: openvpn
+      tags: openvpn

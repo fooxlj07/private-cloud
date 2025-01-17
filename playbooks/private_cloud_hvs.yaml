@@ -38,7 +38,7 @@
   become: true
   roles:
     - role: dnsmasq
-      tags: dns
+      tags: dnsmasq
 
 - name: DNS client
   hosts: all
