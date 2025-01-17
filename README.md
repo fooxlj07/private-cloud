@@ -15,20 +15,22 @@ pipenv shell
 
 provide VAULT_ADDR and VAULT_TOKEN env
 
-access vault ui
-ssh -L 8200:172.16.1.1:8200 root@server01
-then check on local browser http://localhost:8200/ui
+Access vault ui
+Enable openvpn client 
+http://nomad.my-cluster.internal:8200
 
-access consul ui
-ssh -L 8500:172.16.1.1:8500 root@server01
-then check on local browser http://localhost:8500/ui
+Access consul ui
+http://nomad.my-cluster.internal:8500
+
+Access nomad UI
+http://nomad.my-cluster.internal:4646
 
 TODO:
+- be able to deploy on nomad with github ci + use vault for secrets
 - secret management instead of .env and root ca of vault file for root secret during init(used later as well for recovery) !!!
-- OpenVPN remote and local
-- internal domain name dns record
+- get a proper domain name.
+
 - proper ca, may use let's encrypt
 - loadbalance/reverse proxy
-- check with dedibox if can get a domain name without lose my servers
 - log and monitory
 - add log rotation.
