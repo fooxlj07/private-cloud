@@ -1,8 +1,10 @@
 # General settings
+no-resolv
+no-poll
 bind-interfaces
 domain-needed
 bogus-priv
-
+except-interface=eno1
 log-dhcp
 log-queries
 log-facility={{ dns_log_path }}

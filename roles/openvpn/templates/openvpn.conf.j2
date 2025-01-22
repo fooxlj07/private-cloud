@@ -1,6 +1,6 @@
 port {{ openvpn_port }}
 proto {{ openvpn_protocol }}
-dev tap
+dev {{ openvpn_iface }}
 
 ca {{ openvpn_config_server_dir }}/ca.crt
 cert {{ openvpn_config_server_dir }}/server.crt
@@ -16,21 +16,18 @@ cipher AES-256-GCM
 data-ciphers AES-256-GCM:AES-128-GCM
 data-ciphers-fallback AES-256-CBC
 
-# Enable DHCP relay, delegate IP assignment to dnsmasq
-mode server
-dev tap
 server-bridge {{ openvpn_gw_ip }} 255.255.255.0 {{ openvpn_ip_range_start }} {{ openvpn_ip_range_end }}
 ifconfig {{ openvpn_gw_ip }} 255.255.255.0
 client-to-client
 
-# Push routes and DNS for VPN clients
+# Push DNS and domain for VPN clients
 push "route {{ vpn_subnet_id }} 255.255.255.0"
-push "redirect-gateway def1"
 push "dhcp-option DNS {{ dns_server }}"
+push "dhcp-option DOMAIN my-cluster.internal"
 
 persist-key
 persist-tun
-
+duplicate-cn 0
 status /var/log/openvpn/status.log
 log-append /var/log/openvpn/openvpn.log
 verb 3
